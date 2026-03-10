@@ -1,0 +1,6 @@
+operational_scope,dormant,failure,success,success_rate
+branching_workflow,42705,4002,23223,0.3320892320892273
+multi_workflow_orchestration,3503,820,6095,0.585045114225323
+sequential_workflow,23841,1742,7228,0.22029197525219532
+single_action,377,30,97,0.1924603174599356
+unknown,114,17,69,0.344999999998275

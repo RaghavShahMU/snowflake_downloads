@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Agent success and retention analysis – plain readout</title>
+  <style>
+    body { font-family: Georgia, 'Times New Roman', serif; max-width: 800px; margin: 32px auto; padding: 0 16px; line-height: 1.5; color: #222; }
+    h1 { font-size: 1.5em; border-bottom: 1px solid #ccc; padding-bottom: 6px; }
+    h2 { font-size: 1.25em; margin-top: 24px; }
+    h3 { font-size: 1.1em; margin-top: 16px; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0; padding-left: 24px; }
+    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.95em; }
+    th, td { border: 1px solid #999; padding: 6px 10px; text-align: left; }
+    th { background: #f0f0f0; font-weight: bold; }
+    img { max-width: 100%; height: auto; margin: 12px 0; display: block; }
+    .note { font-size: 0.9em; color: #555; margin-top: 24px; }
+  </style>
+</head>
+<body>
+
+<h1>Agent success and retention analysis</h1>
+<p><strong>Last updated:</strong> 2026-03-10 (after full pipeline run with directional analysis and prompts-only)</p>
+
+<p><em>To copy into Word or Google Docs: open this file in a web browser (from the project folder so images load), then Select All (Ctrl/Cmd+A) and Paste into your document.</em></p>
+
+<hr>
+
+<h2>1. Executive summary</h2>
+<ul>
+  <li><strong>Success definition:</strong> Agents active and used at least once after 7 days post-creation; <strong>39,606 success</strong>, 30,889 failure, 86,437 dormant (156,932 total in cohort). Success rate among non-dormant is ~56%.</li>
+  <li><strong>Triggers:</strong> <strong>Scheduled</strong> is the strongest positive driver of success (48.8% of runs among success agents vs 2.5% dormant, 20.3% failure). <strong>Introduction</strong> is strongly associated with failure/dormant (40.5% dormant, 5.3% success). Logistic coefficients confirm: scheduled +1.59, introduction −2.17.</li>
+  <li><strong>Tools:</strong> Success agents use more post_chat_message, read_memory, write_memory, retrieve_activity, create_task (cohort comparison p ≈ 0). RF importance: read_memory, todo_write, post_reply, retrieve_tasks_by_filters. Logistic: todo_write positive, post_reply negative (context-dependent).</li>
+  <li><strong>Prompts (classifications):</strong> Among 113,863 classified agents (36,712 success, 6,611 failure, 70,540 dormant), trigger and template dominate the full model (scheduled +1.25, introduction −1.21; template=custom +0.56). Prompts-only (no trigger/template) shows classification dimensions matter: execution_dataset=collection_scoped, functional_archetype=creator/monitor, data_flow_direction=outbound, output_modality=visual_image.</li>
+  <li><strong>Retention insight:</strong> Driving agents toward scheduled usage and custom templates, and away from introduction-heavy mixes, aligns with higher success. Tool usage (memory, chat, tasks) is higher in success; prompt design (creator/monitor, collection-scoped execution) adds signal when trigger/template are excluded.</li>
+</ul>
+
+<hr>
+
+<h2>2. Methodology</h2>
+<h3>Success criteria</h3>
+<ul>
+  <li><strong>Success:</strong> After 7 days of creation, the agent has been used at least once and is still <strong>active</strong> as of the analysis date.</li>
+  <li><strong>Failure:</strong> Agent is <strong>inactive</strong> and/or <strong>deleted</strong>.</li>
+  <li><strong>Dormant:</strong> Created, not deleted, active, but <strong>no usage post 7 days</strong> of creation.</li>
+</ul>
+<p><strong>Parameters:</strong> analysis_reference_date (see cohort metadata below); days_post_creation = 7.</p>
+
+<h3>Data sources</h3>
+<p>super_agents; super_agent_run; super_agent_tools; agent_classifications (prompts scope: only agents in this table).</p>
+
+<h3>Scope by analysis</h3>
+<table>
+  <tr><th>Analysis</th><th>Scope</th></tr>
+  <tr><td>Success criteria, triggers, tools</td><td>All agents in super_agents.csv</td></tr>
+  <tr><td>Prompts (classifications)</td><td>Only agent_ids in agent_classifications.csv</td></tr>
+</table>
+
+<hr>
+
+<h2>3. Sample and metadata</h2>
+<ul>
+  <li><strong>Cohort size:</strong> 156,932 agents (analysis_reference_date: 2026-03-10).</li>
+  <li><strong>Segment counts:</strong> success 39,606; failure 30,889; dormant 86,437; unknown 0.</li>
+  <li><strong>Classification coverage:</strong> 113,863 agents with classifications (dormant 70,540, success 36,712, failure 6,611).</li>
+</ul>
+
+<h3>Cohort metadata (YAML)</h3>
+<pre>analysis_reference_date: '2026-03-10'
+days_post_creation: 7
+segment_counts:
+  dormant: 86437
+  failure: 30889
+  success: 39606
+total_agents: 156932</pre>
+
+<h3>Cohort segment counts</h3>
+<table>
+  <tr><th>segment</th><th>agent_count</th></tr>
+  <tr><td>dormant</td><td>86,437</td></tr>
+  <tr><td>failure</td><td>30,889</td></tr>
+  <tr><td>success</td><td>39,606</td></tr>
+</table>
+
+<hr>
+
+<h2>4. Assumptions and conditions</h2>
+<p>Reference date set in config (2026-03-10). TRIGGER_SOURCE may include \N (normalized to "unknown" where needed). RF and logistic models use resampled or full data; SHAP on a sample (e.g. 500 agents). Directional interpretation uses signed mean SHAP and logistic coefficients together.</p>
+
+<hr>
+
+<h2>5. Results</h2>
+
+<h3>5.1 Success criteria</h3>
+<p><strong>Cohort distribution chart</strong></p>
+<img src="../analysis/output/cohort_segment_distribution.png" alt="Cohort segment distribution" width="600">
+
+<p><strong>Commentary:</strong> Dormant agents (86,437) outnumber success (39,606) and failure (30,889) combined. Among agents with any usage (success + failure), success rate is ~56%. The large dormant segment indicates many agents are created but never used after the 7-day window—opportunity for activation and onboarding.</p>
+<p><strong>Recommended actions:</strong> Focus on converting dormant agents to first use (onboarding, discovery, scheduled nudges). Monitor failure segment for churn patterns; reinforce triggers and tools associated with success.</p>
+
+<hr>
+
+<h3>5.2 Trigger sources</h3>
+
+<p><strong>Trigger taxonomy (total runs by trigger)</strong></p>
+<table>
+  <tr><th>trigger_source</th><th>total_runs</th></tr>
+  <tr><td>automation</td><td>1,242,456</td></tr>
+  <tr><td>scheduled</td><td>780,600</td></tr>
+  <tr><td>dm</td><td>630,075</td></tr>
+  <tr><td>\N</td><td>177,633</td></tr>
+  <tr><td>introduction</td><td>104,388</td></tr>
+  <tr><td>task_comment_mention</td><td>95,944</td></tr>
+  <tr><td>assignment</td><td>87,086</td></tr>
+  <tr><td>mention</td><td>23,497</td></tr>
+  <tr><td>manual</td><td>8,068</td></tr>
+</table>
+
+<p><strong>Trigger × segment (mean % per agent)</strong></p>
+<table>
+  <tr><th>trigger_source</th><th>dormant</th><th>failure</th><th>success</th></tr>
+  <tr><td>automation</td><td>3.77</td><td>11.88</td><td>11.73</td></tr>
+  <tr><td>scheduled</td><td>2.48</td><td>20.30</td><td>48.80</td></tr>
+  <tr><td>dm</td><td>33.60</td><td>29.13</td><td>21.91</td></tr>
+  <tr><td>\N</td><td>16.15</td><td>8.70</td><td>5.81</td></tr>
+  <tr><td>introduction</td><td>40.52</td><td>23.03</td><td>5.31</td></tr>
+  <tr><td>task_comment_mention</td><td>1.69</td><td>3.07</td><td>3.07</td></tr>
+  <tr><td>assignment</td><td>1.06</td><td>1.53</td><td>1.82</td></tr>
+  <tr><td>mention</td><td>0.52</td><td>1.01</td><td>0.92</td></tr>
+  <tr><td>manual</td><td>0.20</td><td>1.34</td><td>0.62</td></tr>
+</table>
+
+<p><strong>Trigger SHAP direction (signed mean SHAP)</strong></p>
+<table>
+  <tr><th>feature</th><th>mean_shap</th><th>mean_abs_shap</th></tr>
+  <tr><td>introduction</td><td>0.021</td><td>0.134</td></tr>
+  <tr><td>scheduled</td><td>0.016</td><td>0.130</td></tr>
+  <tr><td>\N</td><td>-0.001</td><td>0.031</td></tr>
+  <tr><td>dm</td><td>0.000</td><td>0.026</td></tr>
+  <tr><td>automation</td><td>-0.000</td><td>0.012</td></tr>
+  <tr><td>task_comment_mention</td><td>0.001</td><td>0.009</td></tr>
+  <tr><td>assignment</td><td>~0</td><td>0.003</td></tr>
+  <tr><td>manual</td><td>-0.000</td><td>0.002</td></tr>
+  <tr><td>mention</td><td>0.000</td><td>0.001</td></tr>
+</table>
+
+<p><strong>Trigger logistic regression coefficients</strong></p>
+<table>
+  <tr><th>feature</th><th>coefficient</th></tr>
+  <tr><td>\N</td><td>-0.134</td></tr>
+  <tr><td>assignment</td><td>0.200</td></tr>
+  <tr><td>automation</td><td>0.535</td></tr>
+  <tr><td>dm</td><td>0.423</td></tr>
+  <tr><td>introduction</td><td>-2.172</td></tr>
+  <tr><td>manual</td><td>-0.012</td></tr>
+  <tr><td>mention</td><td>0.125</td></tr>
+  <tr><td>scheduled</td><td>1.587</td></tr>
+  <tr><td>task_comment_mention</td><td>0.265</td></tr>
+</table>
+
+<p><strong>Trigger by segment (chart)</strong></p>
+<img src="../analysis/output/trigger_by_segment.png" alt="Trigger mix by success segment" width="600">
+
+<p><strong>Trigger SHAP bar</strong></p>
+<img src="../analysis/output/trigger_shap_bar.png" alt="Trigger SHAP bar" width="600">
+
+<p><strong>Trigger SHAP beeswarm</strong></p>
+<img src="../analysis/output/trigger_shap_beeswarm.png" alt="Trigger SHAP beeswarm" width="600">
+
+<p><strong>Commentary:</strong> Scheduled has the highest mean % among success agents (48.8%) vs dormant (2.5%) and failure (20.3%). RF importance (0.48) and positive logistic coefficient (+1.59) both indicate scheduled usage strongly pushes toward success. Introduction is dominant in dormant (40.5%) and failure (23.0%) and low in success (5.3%); logistic −2.17 shows introduction-heavy mix is associated with failure/dormant. dm and automation have moderate positive coefficients (+0.42, +0.53).</p>
+<p><strong>Recommended actions:</strong> Double down on scheduled triggers (recurring use) and reduce reliance on introduction as the primary driver. Encourage dm and automation where appropriate.</p>
+
+<hr>
+
+<h3>5.3 ClickUp tools</h3>
+
+<p><strong>Tool taxonomy (top 15 by total calls)</strong></p>
+<table>
+  <tr><th>tool_name</th><th>total_calls</th></tr>
+  <tr><td>todo_write</td><td>8,536,471</td></tr>
+  <tr><td>load_assets</td><td>1,233,334</td></tr>
+  <tr><td>retrieve_tasks_by_filters</td><td>1,198,671</td></tr>
+  <tr><td>post_reply</td><td>926,642</td></tr>
+  <tr><td>update_task</td><td>910,812</td></tr>
+  <tr><td>post_task_comment</td><td>729,663</td></tr>
+  <tr><td>post_chat_message</td><td>727,989</td></tr>
+  <tr><td>load_custom_fields</td><td>547,427</td></tr>
+  <tr><td>search_workspace</td><td>495,664</td></tr>
+  <tr><td>retrieve_activity</td><td>397,596</td></tr>
+  <tr><td>read_memory</td><td>339,381</td></tr>
+  <tr><td>create_task</td><td>294,068</td></tr>
+  <tr><td>create_subtask</td><td>234,867</td></tr>
+  <tr><td>search_public_web</td><td>197,106</td></tr>
+  <tr><td>write_memory</td><td>124,757</td></tr>
+</table>
+
+<p><strong>Tool cohort comparison (success vs failure, top 12 by significance)</strong></p>
+<table>
+  <tr><th>tool</th><th>mean_success</th><th>mean_failure</th><th>p_value</th></tr>
+  <tr><td>write_memory</td><td>0.0285</td><td>0.0145</td><td>0.0</td></tr>
+  <tr><td>view_tools_catalog</td><td>0.0446</td><td>0.0282</td><td>0.0</td></tr>
+  <tr><td>post_chat_message</td><td>0.368</td><td>0.129</td><td>0.0</td></tr>
+  <tr><td>post_reply</td><td>0.364</td><td>0.322</td><td>0.0</td></tr>
+  <tr><td>post_task_comment</td><td>0.186</td><td>0.098</td><td>0.0</td></tr>
+  <tr><td>read_memory</td><td>0.150</td><td>0.045</td><td>0.0</td></tr>
+  <tr><td>retrieve_activity</td><td>0.242</td><td>0.083</td><td>0.0</td></tr>
+  <tr><td>retrieve_chat_messages</td><td>0.024</td><td>0.011</td><td>0.0</td></tr>
+  <tr><td>load_custom_fields</td><td>0.082</td><td>0.044</td><td>0.0</td></tr>
+  <tr><td>create_task</td><td>0.153</td><td>0.061</td><td>0.0</td></tr>
+  <tr><td>retrieve_tasks_by_filters</td><td>0.616</td><td>0.214</td><td>0.0</td></tr>
+  <tr><td>todo_write</td><td>3.15</td><td>1.19</td><td>0.0</td></tr>
+</table>
+
+<p><strong>Tool SHAP direction (top 12)</strong></p>
+<table>
+  <tr><th>feature</th><th>mean_shap</th><th>mean_abs_shap</th></tr>
+  <tr><td>read_memory</td><td>-0.010</td><td>0.084</td></tr>
+  <tr><td>todo_write</td><td>-0.004</td><td>0.058</td></tr>
+  <tr><td>post_reply</td><td>-0.006</td><td>0.052</td></tr>
+  <tr><td>retrieve_tasks_by_filters</td><td>0.002</td><td>0.028</td></tr>
+  <tr><td>load_assets</td><td>~0</td><td>0.020</td></tr>
+  <tr><td>retrieve_activity</td><td>0.001</td><td>0.017</td></tr>
+  <tr><td>search_workspace</td><td>-0.000</td><td>0.016</td></tr>
+  <tr><td>post_chat_message</td><td>-0.000</td><td>0.016</td></tr>
+  <tr><td>post_task_comment</td><td>0.000</td><td>0.009</td></tr>
+  <tr><td>update_task</td><td>0.000</td><td>0.004</td></tr>
+  <tr><td>write_memory</td><td>0.000</td><td>0.003</td></tr>
+  <tr><td>view_tools_catalog</td><td>0.001</td><td>0.003</td></tr>
+</table>
+
+<p><strong>Tool logistic coefficients (top 10 by |coef|)</strong></p>
+<table>
+  <tr><th>feature</th><th>coefficient</th></tr>
+  <tr><td>todo_write</td><td>0.989</td></tr>
+  <tr><td>post_reply</td><td>-0.462</td></tr>
+  <tr><td>read_memory</td><td>0.230</td></tr>
+  <tr><td>retrieve_tasks_by_filters</td><td>0.214</td></tr>
+  <tr><td>complete_execution</td><td>0.152</td></tr>
+  <tr><td>post_chat_message</td><td>0.116</td></tr>
+  <tr><td>write_memory</td><td>0.110</td></tr>
+  <tr><td>edit_image</td><td>-0.120</td></tr>
+  <tr><td>create_list</td><td>-0.081</td></tr>
+  <tr><td>create_document</td><td>-0.094</td></tr>
+</table>
+
+<p><strong>Tool by segment (chart)</strong></p>
+<img src="../analysis/output/tool_by_segment.png" alt="Tool by segment" width="600">
+
+<p><strong>Tool SHAP bar</strong></p>
+<img src="../analysis/output/tool_shap_bar.png" alt="Tool SHAP bar" width="600">
+
+<p><strong>Tool SHAP beeswarm</strong></p>
+<img src="../analysis/output/tool_shap_beeswarm.png" alt="Tool SHAP beeswarm" width="600">
+
+<p><strong>Commentary:</strong> Cohort comparison (Mann-Whitney): write_memory, view_tools_catalog, post_chat_message, post_reply, post_task_comment, read_memory, retrieve_activity, create_task have significantly higher mean usage in success than failure (p ≈ 0). RF importance: read_memory (0.24), todo_write (0.20), post_reply (0.11). Logistic: todo_write +0.99, post_reply −0.46, read_memory +0.23. Use cohort comparison and SHAP-by-value for "higher usage band → higher success."</p>
+<p><strong>Recommended actions:</strong> Promote read_memory, write_memory, retrieve_activity, create_task, post_chat_message, post_task_comment. Use SHAP beeswarm and tool_shap_by_value.csv to see how direction changes by usage level.</p>
+
+<hr>
+
+<h3>5.4 Prompts (classifications)</h3>
+
+<p><strong>Classification coverage</strong></p>
+<table>
+  <tr><th>success_segment</th><th>count</th></tr>
+  <tr><td>dormant</td><td>70,540</td></tr>
+  <tr><td>success</td><td>36,712</td></tr>
+  <tr><td>failure</td><td>6,611</td></tr>
+</table>
+
+<p><strong>Classification trigger by segment (counts)</strong></p>
+<table>
+  <tr><th>trigger_source</th><th>dormant</th><th>failure</th><th>success</th></tr>
+  <tr><td>\N</td><td>13,056</td><td>1,157</td><td>1,666</td></tr>
+  <tr><td>assignment</td><td>577</td><td>84</td><td>559</td></tr>
+  <tr><td>automation</td><td>2,182</td><td>965</td><td>4,743</td></tr>
+  <tr><td>dm</td><td>26,170</td><td>1,332</td><td>7,492</td></tr>
+  <tr><td>introduction</td><td>23,275</td><td>521</td><td>237</td></tr>
+  <tr><td>manual</td><td>24</td><td>31</td><td>39</td></tr>
+  <tr><td>mention</td><td>237</td><td>45</td><td>213</td></tr>
+  <tr><td>scheduled</td><td>646</td><td>1,762</td><td>20,722</td></tr>
+  <tr><td>task_comment_mention</td><td>924</td><td>146</td><td>1,041</td></tr>
+  <tr><td>unknown</td><td>3,449</td><td>568</td><td>0</td></tr>
+</table>
+
+<p><strong>Classification template by segment</strong></p>
+<table>
+  <tr><th>TEMPLATE_TYPE</th><th>dormant</th><th>failure</th><th>success</th></tr>
+  <tr><td>custom</td><td>67,091</td><td>6,043</td><td>36,712</td></tr>
+  <tr><td>unknown</td><td>3,449</td><td>568</td><td>0</td></tr>
+</table>
+
+<p><strong>Classification RF importance (full model, top 15)</strong></p>
+<table>
+  <tr><th>feature</th><th>importance</th></tr>
+  <tr><td>trigger=scheduled</td><td>0.349</td></tr>
+  <tr><td>trigger=introduction</td><td>0.122</td></tr>
+  <tr><td>functional_archetype=creator</td><td>0.070</td></tr>
+  <tr><td>execution_dataset=collection_scoped</td><td>0.069</td></tr>
+  <tr><td>trigger=\N</td><td>0.047</td></tr>
+  <tr><td>trigger=dm</td><td>0.036</td></tr>
+  <tr><td>functional_archetype=monitor</td><td>0.033</td></tr>
+  <tr><td>trigger=automation</td><td>0.031</td></tr>
+  <tr><td>data_flow_direction=outbound</td><td>0.022</td></tr>
+  <tr><td>execution_dataset=single_user_prompt</td><td>0.021</td></tr>
+  <tr><td>domain_industry_vertical=creative_design</td><td>0.020</td></tr>
+  <tr><td>output_modality=visual_image</td><td>0.016</td></tr>
+  <tr><td>execution_dataset=collection_unbounded</td><td>0.014</td></tr>
+  <tr><td>template=unknown</td><td>0.012</td></tr>
+  <tr><td>template=custom</td><td>0.011</td></tr>
+</table>
+
+<p><strong>Classification SHAP direction (full model, top 12)</strong></p>
+<table>
+  <tr><th>feature</th><th>mean_shap</th><th>mean_abs_shap</th></tr>
+  <tr><td>trigger=scheduled</td><td>-0.004</td><td>0.116</td></tr>
+  <tr><td>trigger=introduction</td><td>0.005</td><td>0.064</td></tr>
+  <tr><td>execution_dataset=collection_scoped</td><td>-0.004</td><td>0.025</td></tr>
+  <tr><td>functional_archetype=creator</td><td>0.002</td><td>0.025</td></tr>
+  <tr><td>trigger=\N</td><td>-0.000</td><td>0.024</td></tr>
+  <tr><td>trigger=automation</td><td>0.000</td><td>0.018</td></tr>
+  <tr><td>trigger=dm</td><td>-0.002</td><td>0.012</td></tr>
+  <tr><td>execution_dataset=single_user_prompt</td><td>-0.000</td><td>0.010</td></tr>
+  <tr><td>functional_archetype=monitor</td><td>0.000</td><td>0.008</td></tr>
+  <tr><td>domain_industry_vertical=creative_design</td><td>0.002</td><td>0.008</td></tr>
+  <tr><td>output_modality=visual_image</td><td>0.001</td><td>0.007</td></tr>
+  <tr><td>template=unknown</td><td>0.001</td><td>0.007</td></tr>
+</table>
+
+<p><strong>Operational scope × success rate</strong></p>
+<table>
+  <tr><th>operational_scope</th><th>dormant</th><th>failure</th><th>success</th><th>success_rate</th></tr>
+  <tr><td>branching_workflow</td><td>42,705</td><td>4,002</td><td>23,223</td><td>0.33</td></tr>
+  <tr><td>multi_workflow_orchestration</td><td>3,503</td><td>820</td><td>6,095</td><td>0.59</td></tr>
+  <tr><td>sequential_workflow</td><td>23,841</td><td>1,742</td><td>7,228</td><td>0.22</td></tr>
+  <tr><td>single_action</td><td>377</td><td>30</td><td>97</td><td>0.19</td></tr>
+  <tr><td>unknown</td><td>114</td><td>17</td><td>69</td><td>0.34</td></tr>
+</table>
+
+<p><strong>Classification SHAP bar</strong></p>
+<img src="../analysis/output/classification_shap_bar.png" alt="Classification SHAP bar" width="600">
+
+<p><strong>Classification SHAP beeswarm</strong></p>
+<img src="../analysis/output/classification_shap_beeswarm.png" alt="Classification SHAP beeswarm" width="600">
+
+<p><strong>Success rate by operational_scope (chart)</strong></p>
+<img src="../analysis/output/classification_operational_scope_success_rate.png" alt="Operational scope success rate" width="600">
+
+<p><strong>Commentary (full model):</strong> Trigger and template dominate (scheduled +1.25, introduction −1.21; template=custom +0.56). Classification dimensions: functional_archetype=creator/monitor, execution_dataset=collection_scoped, data_flow_direction=outbound, output_modality=visual_image have notable importance. operational_scope: multi_workflow_orchestration has highest success rate (~58.5%).</p>
+<p><strong>Recommended actions:</strong> Prioritize scheduled trigger and custom template. See §5.5 Prompts-only for dedicated section (no trigger/template).</p>
+
+<hr>
+
+<h3>5.5 Prompts-only analysis (no trigger, no template)</h3>
+<p>Model uses <strong>only</strong> one-hot encoded classification dimensions (LLM-derived prompt dimensions). No trigger or template features. Same cohort (113,863 classified agents).</p>
+
+<p><strong>Prompts-only RF importance (top 12)</strong></p>
+<table>
+  <tr><th>feature</th><th>importance</th></tr>
+  <tr><td>execution_dataset=collection_scoped</td><td>0.174</td></tr>
+  <tr><td>functional_archetype=creator</td><td>0.134</td></tr>
+  <tr><td>functional_archetype=monitor</td><td>0.090</td></tr>
+  <tr><td>execution_dataset=single_user_prompt</td><td>0.069</td></tr>
+  <tr><td>execution_dataset=collection_unbounded</td><td>0.047</td></tr>
+  <tr><td>data_flow_direction=outbound</td><td>0.041</td></tr>
+  <tr><td>output_modality=visual_image</td><td>0.036</td></tr>
+  <tr><td>domain_industry_vertical=creative_design</td><td>0.035</td></tr>
+  <tr><td>operational_scope=multi_workflow_orchestration</td><td>0.034</td></tr>
+  <tr><td>execution_dataset=single_event_data</td><td>0.031</td></tr>
+  <tr><td>execution_dataset=single_asset_from_user</td><td>0.027</td></tr>
+  <tr><td>domain_industry_vertical=project_management_ops</td><td>0.027</td></tr>
+</table>
+
+<p><strong>Prompts-only SHAP bar</strong></p>
+<img src="../analysis/output/classification_prompts_only_shap_bar.png" alt="Prompts-only SHAP bar" width="600">
+
+<p><strong>Prompts-only SHAP beeswarm</strong></p>
+<img src="../analysis/output/classification_prompts_only_shap_beeswarm.png" alt="Prompts-only SHAP beeswarm" width="600">
+
+<p><strong>Commentary:</strong> Top importance: execution_dataset=collection_scoped (0.17), functional_archetype=creator (0.13), monitor (0.09). Prompt design (execution scope, archetype, data flow, modality) carries signal for success when trigger and template are excluded. Logistic (prompts-only): creative_design and consultative autonomy negative; project_management_ops, finance_accounting, personal_productivity positive.</p>
+<p><strong>Recommended actions:</strong> Use prompts-only outputs to iterate on classification dimensions without conflating with trigger/template. Compare with full model (§5.4).</p>
+
+<hr>
+
+<h2>6. Appendix – output file reference</h2>
+<ul>
+  <li>Trigger taxonomy: trigger_taxonomy.csv</li>
+  <li>Tool list: tool_taxonomy.csv</li>
+  <li>Classification dimension tables: classification_dim_*.csv</li>
+  <li>Cohort summary: cohort_metadata.yaml, cohort_segment_counts.csv</li>
+  <li>RF/SHAP and directional: *_rf_importance.csv, *_shap_summary.csv, *_shap_direction.csv, *_shap_by_value.csv, *_logistic_coefficients.csv, *_shap_bar.png, *_shap_beeswarm.png</li>
+  <li>Prompts-only: classification_prompts_only_* (see §5.5)</li>
+  <li>Scripts: define_success_cohort.py, trigger_success_analysis.py, tool_success_analysis.py, classification_success_analysis.py, run_all_analysis.py, config.yaml</li>
+</ul>
+
+<p class="note">All paths above are relative to the project folder. Open this HTML file from the project directory (e.g. docs/agent_success_retention_readout_plain.html) so that image paths ../analysis/output/*.png resolve. Then Select All and Paste into Word or Google Docs to retain tables and images.</p>
+
+</body>
+</html>

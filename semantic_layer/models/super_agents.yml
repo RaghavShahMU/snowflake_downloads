@@ -1,0 +1,235 @@
+# Semantic model: super_agents
+# Last updated: 2025-03-10
+# Source: data/super_agents.csv
+# Grain: one row per agent (as created in ClickUp)
+
+name: super_agents
+description: All agents ever created by users in ClickUp (identity, status, features, schedules, memory, tools, workspace assets).
+source:
+  type: csv
+  path: data/super_agents.csv
+  grain:
+    - AGENT_ID
+
+dimensions:
+  # Identifiers
+  - name: agent_id
+    source: AGENT_ID
+    type: string
+    description: Unique agent ID (primary key).
+  - name: agent_user_id
+    source: AGENT_USER_ID
+    type: integer
+    description: User-scoped agent identifier.
+  - name: workspace_id
+    source: WORKSPACE_ID
+    type: integer
+    description: Workspace the agent belongs to.
+  - name: agent_creator_user_id
+    source: AGENT_CREATOR_USER_ID
+    type: integer
+    description: User who created the agent.
+  - name: agent_deleted_user_id
+    source: AGENT_DELETED_USER_ID
+    type: integer
+    description: User who deleted the agent (when deleted).
+    nullable: true
+
+  # Lifecycle & status
+  - name: agent_created_at
+    source: AGENT_CREATED_AT
+    type: timestamp
+    description: When the agent was created.
+  - name: agent_last_updated_at
+    source: AGENT_LAST_UPDATED_AT
+    type: timestamp
+    description: Last update time.
+  - name: agent_deleted_at
+    source: AGENT_DELETED_AT
+    type: timestamp
+    description: When the agent was deleted (null if not deleted).
+    nullable: true
+  - name: agent_version
+    source: AGENT_VERSION
+    type: string
+    description: Agent version (e.g. v1.0).
+  - name: agent_classification
+    source: AGENT_CLASSIFICATION
+    type: string
+    description: Classification label (e.g. Super Agent).
+  - name: current_agent_status
+    source: CURRENT_AGENT_STATUS
+    type: string
+    description: active | inactive | deleted.
+
+  # Infrastructure
+  - name: metadata_shard
+    source: METADATA_SHARD
+    type: string
+    description: Region/shard identifier.
+  - name: agent_builder_conversation_id
+    source: AGENT_BUILDER_CONVERSATION_ID
+    type: integer
+    description: Builder conversation ID.
+    nullable: true
+
+  # Feature flags
+  - name: is_dm_enabled
+    source: IS_DM_ENABLED
+    type: boolean
+    description: DM (direct message) enabled.
+  - name: is_mentions_enabled
+    source: IS_MENTIONS_ENABLED
+    type: boolean
+    description: Mentions enabled.
+  - name: is_assignee_enabled
+    source: IS_ASSIGNEE_ENABLED
+    type: boolean
+    description: Assignee feature enabled.
+  - name: has_schedules
+    source: HAS_SCHEDULES
+    type: boolean
+    description: Agent has at least one schedule.
+  - name: is_memory_enabled
+    source: IS_MEMORY_ENABLED
+    type: boolean
+    description: Memory feature enabled.
+  - name: is_episodic_memory_enabled
+    source: IS_EPISODIC_MEMORY_ENABLED
+    type: boolean
+    description: Episodic memory enabled.
+  - name: is_ai_generated_memory_enabled
+    source: IS_AI_GENERATED_MEMORY_ENABLED
+    type: boolean
+    description: AI-generated memory enabled.
+  - name: is_preferences_memory_enabled
+    source: IS_PREFERENCES_MEMORY_ENABLED
+    type: boolean
+    description: Preferences memory enabled.
+
+  # Schedules
+  - name: schedule_ids
+    source: SCHEDULE_IDS
+    type: string
+    description: JSON-like array of schedule IDs.
+    nullable: true
+  - name: schedule_count
+    source: SCHEDULE_COUNT
+    type: integer
+    description: Number of schedules.
+
+  # Memory
+  - name: memory_doc_id
+    source: MEMORY_DOC_ID
+    type: string
+    description: Memory doc ID.
+    nullable: true
+  - name: memory_preferences_page_id
+    source: MEMORY_PREFERENCES_PAGE_ID
+    type: string
+    description: Preferences page ID for memory.
+    nullable: true
+
+  # Tools & knowledge
+  - name: configured_agent_tool_count
+    source: CONFIGURED_AGENT_TOOL_COUNT
+    type: integer
+    description: Number of tools configured.
+  - name: configured_agent_tool_names
+    source: CONFIGURED_AGENT_TOOL_NAMES
+    type: string
+    description: JSON-like array of tool names.
+    nullable: true
+  - name: configured_app_knowledge_count
+    source: CONFIGURED_APP_KNOWLEDGE_COUNT
+    type: integer
+    description: Number of app knowledge sources.
+  - name: configured_app_knowledge_names
+    source: CONFIGURED_APP_KNOWLEDGE_NAMES
+    type: string
+    description: Names of app knowledge sources.
+    nullable: true
+  - name: connected_external_apps
+    source: CONNECTED_EXTERNAL_APPS
+    type: string
+    description: Connected external apps (array/JSON).
+    nullable: true
+  - name: workspace_knowledge_asset_types
+    source: WORKSPACE_KNOWLEDGE_ASSET_TYPES
+    type: string
+    description: Asset types used for workspace knowledge.
+    nullable: true
+
+  # Workspace & private asset counts
+  - name: workspace_assets_chat_count
+    source: WORKSPACE_ASSETS_CHAT_COUNT
+    type: integer
+    description: Count of chat assets.
+  - name: workspace_assets_doc_count
+    source: WORKSPACE_ASSETS_DOC_COUNT
+    type: integer
+    description: Count of doc assets.
+  - name: workspace_assets_folder_count
+    source: WORKSPACE_ASSETS_FOLDER_COUNT
+    type: integer
+    description: Count of folder assets.
+  - name: workspace_assets_list_count
+    source: WORKSPACE_ASSETS_LIST_COUNT
+    type: integer
+    description: Count of list assets.
+  - name: workspace_assets_space_count
+    source: WORKSPACE_ASSETS_SPACE_COUNT
+    type: integer
+    description: Count of space assets.
+  - name: workspace_assets_task_count
+    source: WORKSPACE_ASSETS_TASK_COUNT
+    type: integer
+    description: Count of task assets.
+  - name: private_assets_chat_count
+    source: PRIVATE_ASSETS_CHAT_COUNT
+    type: integer
+  - name: private_assets_doc_count
+    source: PRIVATE_ASSETS_DOC_COUNT
+    type: integer
+  - name: private_assets_folder_count
+    source: PRIVATE_ASSETS_FOLDER_COUNT
+    type: integer
+  - name: private_assets_list_count
+    source: PRIVATE_ASSETS_LIST_COUNT
+    type: integer
+  - name: private_assets_space_count
+    source: PRIVATE_ASSETS_SPACE_COUNT
+    type: integer
+  - name: private_assets_task_count
+    source: PRIVATE_ASSETS_TASK_COUNT
+    type: integer
+
+measures:
+  - name: agent_count
+    type: count
+    description: Number of agents.
+    dimension: agent_id
+  - name: active_agent_count
+    type: count
+    description: Number of agents with status active.
+    filter: current_agent_status = 'active'
+  - name: deleted_agent_count
+    type: count
+    description: Number of deleted agents.
+    filter: agent_deleted_at IS NOT NULL
+  - name: avg_configured_tool_count
+    type: avg
+    source: CONFIGURED_AGENT_TOOL_COUNT
+    description: Average number of configured tools per agent.
+  - name: avg_schedule_count
+    type: avg
+    source: SCHEDULE_COUNT
+    description: Average number of schedules per agent.
+  - name: total_workspace_assets_doc_count
+    type: sum
+    source: WORKSPACE_ASSETS_DOC_COUNT
+    description: Sum of doc assets across all agents.
+  - name: total_workspace_assets_task_count
+    type: sum
+    source: WORKSPACE_ASSETS_TASK_COUNT
+    description: Sum of task assets across all agents.

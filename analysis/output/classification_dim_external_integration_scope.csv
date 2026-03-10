@@ -1,0 +1,7 @@
+external_integration_scope,dormant,failure,success,success_rate
+calendar_integration,921,280,1192,0.49811951525261255
+clickup_only,59726,5186,28713,0.3066809078771663
+email_integration,1044,326,1468,0.5172656800561954
+multiple_external_systems,1348,285,1541,0.48550724637665865
+unknown,352,133,527,0.5207509881417779
+web_research_integration,7149,401,3271,0.3022825986507437

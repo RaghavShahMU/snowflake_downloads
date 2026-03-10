@@ -1,0 +1,4 @@
+success_segment,count,success_rate
+dormant,70540,0.3224225604454476
+success,36712,0.3224225604454476
+failure,6611,0.3224225604454476

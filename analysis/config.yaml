@@ -1,0 +1,16 @@
+# Agent success and retention analysis — config
+# analysis_reference_date: "as of" date for segment definitions (use max date in run data if not set)
+# days_post_creation: 7 (success = used after 7 days and still active)
+
+analysis_reference_date: null   # set to YYYY-MM-DD or leave null to use max(RUN_STARTED_AT) from data
+days_post_creation: 7
+
+paths:
+  data_dir: data
+  output_dir: analysis/output
+
+data_files:
+  super_agents: super_agents.csv
+  super_agent_run: super_agent_run.csv
+  super_agent_tools: super_agent_tools.csv
+  agent_classifications: agent_classifications.csv

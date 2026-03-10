@@ -1,0 +1,28 @@
+# Semantic layer model index
+# Last updated: 2025-03-10
+# Lists all defined models and their source files.
+
+models:
+  - name: super_agents
+    description: All agents ever created by users in ClickUp.
+    source: data/super_agents.csv
+    definition: super_agents.yml
+    documentation: super_agents.md
+
+  - name: super_agent_run
+    description: All triggered agent runs; one agent can have multiple runs. Joins to super_agents on AGENT_ID.
+    source: data/super_agent_run.csv
+    definition: super_agent_run.yml
+    documentation: super_agent_run.md
+
+  - name: super_agent_tools
+    description: Tool-level grain; one row per tool call. 1 Agent -> many Runs; 1 Run -> many tool calls. Joins to super_agents on AGENT_ID, to super_agent_run on RUN_ID.
+    source: data/super_agent_tools.csv
+    definition: super_agent_tools.yml
+    documentation: super_agent_tools.md
+
+  - name: agent_classifications
+    description: LLM-derived classification of agents from agent/memory prompt (~10-12 dimensions). One row per agent. Join to super_agents on agent_id.
+    source: data/agent_classifications.csv
+    definition: agent_classifications.yml
+    documentation: agent_classifications.md

@@ -1,0 +1,8 @@
+feature,value,mean_shap,n_agents
+template_is_custom,0,-0.11428294499637559,22
+template_is_custom,1,0.006014891841914505,478
+template_is_templated,0,0.0,500
+template=custom,0,-0.11436601278837774,22
+template=custom,1,0.00601926383096725,478
+template=unknown,0,0.004681634809821845,478
+template=unknown,1,-0.08895106138661507,22

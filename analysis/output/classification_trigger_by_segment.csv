@@ -1,0 +1,11 @@
+trigger_source,dormant,failure,success
+\N,13052,1152,1664
+assignment,557,84,571
+automation,2186,973,4740
+dm,26186,1343,7501
+introduction,23282,514,236
+manual,27,31,42
+mention,238,44,216
+scheduled,655,1756,20704
+task_comment_mention,908,146,1038
+unknown,3449,568,0

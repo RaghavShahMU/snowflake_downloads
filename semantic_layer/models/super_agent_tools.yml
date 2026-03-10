@@ -1,0 +1,215 @@
+# Semantic model: super_agent_tools
+# Last updated: 2025-03-10
+# Source: data/super_agent_tools.csv
+# Grain: one row per tool call (tool-level)
+# Hierarchy: 1 Agent -> Many Runs; 1 Run -> Many tool calls
+# Join to super_agents: AGENT_ID
+# Join to super_agent_run: RUN_ID
+
+name: super_agent_tools
+description: Tool-level grain; each run can have multiple tool calls. Join to super_agents on AGENT_ID, to super_agent_run on RUN_ID.
+source:
+  type: csv
+  path: data/super_agent_tools.csv
+  grain:
+    - AGENT_TOOL_ID
+  joins:
+    - model: super_agents
+      on: AGENT_ID
+    - model: super_agent_run
+      on: RUN_ID
+
+dimensions:
+  # Identifiers
+  - name: agent_tool_id
+    source: AGENT_TOOL_ID
+    type: string
+    description: Unique tool-call ID (primary key).
+  - name: run_id
+    source: RUN_ID
+    type: string
+    description: Run this call belongs to (FK to super_agent_run.RUN_ID).
+  - name: agent_id
+    source: AGENT_ID
+    type: string
+    description: Agent (FK to super_agents.AGENT_ID).
+  - name: workspace_id
+    source: WORKSPACE_ID
+    type: integer
+    description: Workspace.
+
+  # Timing
+  - name: run_started_at
+    source: RUN_STARTED_AT
+    type: timestamp
+    description: When the parent run started.
+  - name: call_started_at
+    source: CALL_STARTED_AT
+    type: string
+    description: When this tool call started (cast to timestamp if needed).
+  - name: total_duration_ms
+    source: TOTAL_DURATION_MS
+    type: string
+    description: Duration of this call in ms (cast to numeric for analysis).
+
+  # Call type & identity
+  - name: call_type
+    source: CALL_TYPE
+    type: string
+    description: e.g. llm_call, clickup_tool.
+  - name: call_subtype
+    source: CALL_SUBTYPE
+    type: string
+    description: e.g. external_llm_call, clickup_tool_call, clickup_tool_external_llm_call.
+  - name: call_name
+    source: CALL_NAME
+    type: string
+    description: Name of the call (e.g. prompt/tool name).
+  - name: vendor
+    source: VENDOR
+    type: string
+    description: e.g. openai, clickup, google.
+  - name: invocation_order
+    source: INVOCATION_ORDER
+    type: integer
+    description: Order of this call within the run.
+  - name: clickup_tool_invocation_order
+    source: CLICKUP_TOOL_INVOCATION_ORDER
+    type: string
+    nullable: true
+  - name: clickup_tool_type
+    source: CLICKUP_TOOL_TYPE
+    type: string
+    nullable: true
+
+  # Success & retries
+  - name: is_success
+    source: IS_SUCCESS
+    type: string
+    nullable: true
+  - name: is_call_billed_to_customer
+    source: IS_CALL_BILLED_TO_CUSTOMER
+    type: boolean
+    description: Whether this call was billed to the customer.
+  - name: call_attempt_number
+    source: CALL_ATTEMPT_NUMBER
+    type: integer
+  - name: is_first_call
+    source: IS_FIRST_CALL
+    type: boolean
+  - name: is_clickup_tool_call_retry
+    source: IS_CLICKUP_TOOL_CALL_RETRY
+    type: string
+    nullable: true
+  - name: is_clickup_tool_call_retry_successful
+    source: IS_CLICKUP_TOOL_CALL_RETRY_SUCCESSFUL
+    type: string
+    nullable: true
+  - name: clickup_tool_retry_chain_position
+    source: CLICKUP_TOOL_RETRY_CHAIN_POSITION
+    type: string
+    nullable: true
+  - name: clickup_tool_retry_chain_length
+    source: CLICKUP_TOOL_RETRY_CHAIN_LENGTH
+    type: string
+    nullable: true
+  - name: is_clickup_tool_retry_chain_successful
+    source: IS_CLICKUP_TOOL_RETRY_CHAIN_SUCCESSFUL
+    type: string
+    nullable: true
+
+  # LLM / token usage (many VARCHAR in CSV; cast for measures)
+  - name: clickup_tool_llm_call_count
+    source: CLICKUP_TOOL_LLM_CALL_COUNT
+    type: string
+    nullable: true
+  - name: has_nested_external_llm_calls
+    source: HAS_NESTED_EXTERNAL_LLM_CALLS
+    type: string
+    nullable: true
+  - name: num_tokens_full
+    source: NUM_TOKENS_FULL
+    type: string
+    nullable: true
+  - name: num_tokens_compact
+    source: NUM_TOKENS_COMPACT
+    type: string
+    nullable: true
+  - name: num_tokens_squashed
+    source: NUM_TOKENS_SQUASHED
+    type: string
+    nullable: true
+  - name: model
+    source: MODEL
+    type: string
+    description: Model used (e.g. gpt-4.1-mini).
+  - name: cost
+    source: COST
+    type: string
+    description: Cost of this call (cast to decimal for analysis).
+  - name: input_token_count
+    source: INPUT_TOKEN_COUNT
+    type: string
+    nullable: true
+  - name: output_token_count
+    source: OUTPUT_TOKEN_COUNT
+    type: string
+    nullable: true
+  - name: input_cached_token_count
+    source: INPUT_CACHED_TOKEN_COUNT
+    type: string
+    nullable: true
+  - name: time_to_first_token_ms
+    source: TIME_TO_FIRST_TOKEN_MS
+    type: string
+    nullable: true
+  - name: service_tier
+    source: SERVICE_TIER
+    type: string
+    nullable: true
+  - name: parent_tool_name
+    source: PARENT_TOOL_NAME
+    type: string
+    nullable: true
+  - name: parent_agent_tool_id
+    source: PARENT_AGENT_TOOL_ID
+    type: string
+    nullable: true
+
+measures:
+  - name: tool_call_count
+    type: count
+    description: Number of tool/LLM calls.
+    dimension: agent_tool_id
+  - name: distinct_run_count
+    type: count_distinct
+    dimension: run_id
+    description: Number of distinct runs that had at least one tool call.
+  - name: distinct_agent_count
+    type: count_distinct
+    dimension: agent_id
+    description: Number of distinct agents that had at least one tool call.
+  - name: llm_call_count
+    type: count
+    description: Number of rows where call_type is llm_call.
+    filter: call_type = 'llm_call'
+  - name: clickup_tool_call_count
+    type: count
+    description: Number of rows where call_type is clickup_tool.
+    filter: call_type = 'clickup_tool'
+  - name: billed_call_count
+    type: count
+    description: Number of calls billed to customer.
+    filter: is_call_billed_to_customer = true
+  - name: total_cost
+    type: sum
+    source: COST
+    description: Sum of cost across all tool calls (cast COST to decimal at query time).
+  - name: total_input_tokens
+    type: sum
+    source: INPUT_TOKEN_COUNT
+    description: Sum of input tokens (cast to numeric at query time).
+  - name: total_output_tokens
+    type: sum
+    source: OUTPUT_TOKEN_COUNT
+    description: Sum of output tokens (cast to numeric at query time).

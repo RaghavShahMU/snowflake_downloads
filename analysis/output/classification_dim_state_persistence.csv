@@ -1,0 +1,5 @@
+state_persistence,dormant,failure,success,success_rate
+state_accumulating,6867,764,5487,0.41828022564412115
+state_referencing,4538,408,2332,0.320417697169508
+stateless,248,24,92,0.2527472527465584
+unknown,58887,5415,28801,0.30934556351567283

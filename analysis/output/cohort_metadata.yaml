@@ -1,0 +1,7 @@
+analysis_reference_date: '2026-03-10'
+days_post_creation: 7
+segment_counts:
+  dormant: 86437
+  failure: 30889
+  success: 39606
+total_agents: 156932

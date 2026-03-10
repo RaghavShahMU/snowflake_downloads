@@ -1,0 +1,287 @@
+# Semantic model: agent_classifications
+# Last updated: 2025-03-10
+# Source: data/agent_classifications.csv
+# Grain: one row per agent (LLM-classified from agent/memory prompt)
+# Join to super_agents: agent_id -> super_agents.AGENT_ID
+# Classifications are stable per agent (memory/agent prompt); do not vary by run or tool.
+
+name: agent_classifications
+description: LLM-derived classification of agents from agent/memory prompt (~10-12 dimensions). One row per agent. Join to super_agents on agent_id.
+source:
+  type: csv
+  path: data/agent_classifications.csv
+  grain:
+    - agent_id
+  joins:
+    - model: super_agents
+      on: agent_id
+
+dimensions:
+  - name: agent_id
+    source: agent_id
+    type: string
+    description: Agent ID (PK, FK to super_agents.AGENT_ID).
+
+  - name: team_orientation
+    source: team_orientation
+    type: string
+    description: Whether the agent is framed for an individual, small team, or larger team.
+    options:
+      - value: individual
+        description: Agent is oriented to a single user.
+      - value: small_team
+        description: Agent is oriented to a small team.
+      - value: larger_team
+        description: Agent is oriented to a larger team.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: domain_knowledge_depth
+    source: domain_knowledge_depth
+    type: string
+    description: How much specialized field expertise is baked into the prompt (generic vs. craft knowledge vs. formal processes).
+    options:
+      - value: none
+        description: Generic instructions only — no domain references.
+      - value: light
+        description: Domain is the setting, not the skill — swap names, logic unchanged.
+      - value: moderate
+        description: Domain craft knowledge essential — techniques, frameworks, quality criteria.
+      - value: deep
+        description: Formal procedural knowledge — lifecycle stages, compliance gates.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: operational_scope
+    source: operational_scope
+    type: string
+    description: How complex the agent's workflow is per run (one action vs. linear pipeline vs. branching logic vs. multiple independent workflows).
+    options:
+      - value: single_action
+        description: One discrete action per invocation.
+      - value: sequential_workflow
+        description: Multi-step linear pipeline; conditionals are guard clauses only.
+      - value: branching_workflow
+        description: Core logic diverges based on input type or business rules.
+      - value: multi_workflow_orchestration
+        description: Two or more independent sub-workflows in one agent.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: data_flow_direction
+    source: data_flow_direction
+    type: string
+    description: Where data moves relative to ClickUp (pulling in, reshuffling internally, pushing out, or both directions).
+    options:
+      - value: inbound
+        description: Captures external data into ClickUp.
+      - value: processing
+        description: Restructures/condenses ClickUp data; output stays in ClickUp.
+      - value: outbound
+        description: Output leaves ClickUp or is genuinely new intellectual content.
+      - value: bidirectional
+        description: Requires both importing and exporting external data.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: autonomy_level
+    source: autonomy_level
+    type: string
+    description: Whether the agent asks before acting, acts then reports, or acts silently on its own.
+    options:
+      - value: consultative
+        description: Asks user before acting — human gates the action.
+      - value: human_in_the_loop
+        description: Acts first, then reports for human review.
+      - value: autonomous
+        description: Acts without asking; handles edge cases via fallback rules.
+      - value: enforcer
+        description: Validates compliance and corrects violations.
+      - value: monitor
+        description: Surfaces alerts without fixing anything.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: functional_archetype
+    source: functional_archetype
+    type: string
+    description: The agent's primary job function (creating, organizing, analyzing, communicating, monitoring, or enforcing).
+    options:
+      - value: communicator
+        description: Drafts and sends messages (emails, DMs, notifications).
+      - value: analyzer
+        description: Produces insights, metrics, or recommendations from data.
+      - value: organizer
+        description: Structures, routes, or categorizes existing work items.
+      - value: creator
+        description: Generates new content — writing, images, docs, code.
+      - value: monitor
+        description: Observes and reports; does not create or enforce.
+      - value: enforcer
+        description: Enforces rules, compliance, or corrections.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: tone_and_persona
+    source: tone_and_persona
+    type: string
+    description: The communication style the agent adopts (formal, casual, technical, or empathetic).
+    options:
+      - value: professional_formal
+        description: Concise, structured, executive-ready.
+      - value: casual_friendly
+        description: Warm, conversational, approachable.
+      - value: technical_precise
+        description: Data-driven, rigorous, systematic.
+      - value: empathetic_supportive
+        description: Encouraging, coaching, patient.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: execution_dataset
+    source: execution_dataset
+    type: string
+    description: What the agent works on per invocation and who decides the scope.
+    options:
+      - value: single_event_data
+        description: Triggered by one ClickUp automation event.
+      - value: single_user_prompt
+        description: User sends a request/brief; agent creates in response.
+      - value: single_asset_from_user
+        description: User provides material; agent parses/transforms it.
+      - value: collection_scoped
+        description: Queries a defined scope (named lists, time windows).
+      - value: collection_unbounded
+        description: Searches broadly with no predetermined boundary.
+      - value: messages
+        description: Comments, DMs, or chat messages.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: output_modality
+    source: output_modality
+    type: string
+    description: The type of artifact the agent primarily produces (messages, docs, tasks, images, or emails).
+    options:
+      - value: structured_document
+        description: ClickUp Docs or Doc Pages.
+      - value: task_artifact
+        description: Tasks, subtasks, or checklists.
+      - value: visual_image
+        description: AI-generated images or visual designs.
+      - value: email_external_message
+        description: Emails or messages sent outside ClickUp.
+      - value: messages
+        description: Comments, DMs, or in-app messages.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: domain_industry_vertical
+    source: domain_industry_vertical
+    type: string
+    description: Which industry or functional area the agent serves.
+    options:
+      - value: project_management_ops
+        description: Projects, sprints, standups, deadlines, capacity.
+      - value: sales_crm
+        description: Deals, pipeline, leads, CRM, revenue.
+      - value: marketing_content
+        description: Content, social media, SEO, campaigns, branding.
+      - value: hr_people
+        description: Hiring, recruiting, onboarding, performance.
+      - value: legal_compliance
+        description: Legal, contracts, compliance, regulatory.
+      - value: finance_accounting
+        description: Budgeting, invoicing, financial reporting.
+      - value: education_academic
+        description: Teaching, tutoring, coursework, exam prep.
+      - value: personal_productivity
+        description: Personal planning, habits, journaling (non-work).
+      - value: creative_design
+        description: Graphic design, UI/UX, image generation, video.
+      - value: it_engineering
+        description: Software dev, coding, debugging, DevOps.
+      - value: general_cross_functional
+        description: General-purpose or doesn't fit a specific vertical.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: state_persistence
+    source: state_persistence
+    type: string
+    description: Whether and how the agent keeps state across invocations.
+    options:
+      - value: stateless
+        description: No state kept across calls.
+      - value: state_referencing
+        description: References existing state but does not accumulate.
+      - value: state_accumulating
+        description: Accumulates state across invocations.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: external_integration_scope
+    source: external_integration_scope
+    type: string
+    description: Extent of integration with systems outside ClickUp.
+    options:
+      - value: clickup_only
+        description: No external integrations; ClickUp only.
+      - value: email_integration
+        description: Integrates with email.
+      - value: calendar_integration
+        description: Integrates with calendar.
+      - value: web_research_integration
+        description: Uses web/search or research tools.
+      - value: multiple_external_systems
+        description: Integrates with multiple external systems.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: use_case_context
+    source: use_case_context
+    type: string
+    description: High-level context of how the agent is used.
+    options:
+      - value: specific_use_case
+        description: Tied to a specific workflow or business use case.
+      - value: general_productivity
+        description: General productivity assistance.
+      - value: personal_use_case
+        description: Personal use (e.g. study, habits).
+      - value: personal_productivity
+        description: Personal productivity.
+      - value: entertainment
+        description: Entertainment or non-work.
+      - value: test_or_placeholder
+        description: Test or placeholder agent.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: implied_end_date
+    source: implied_end_date
+    type: string
+    description: Whether the agent's use case implies a defined end date.
+    options:
+      - value: "true"
+        description: Use case implies an end date.
+      - value: "false"
+        description: No implied end date.
+      - value: unknown
+        description: Could not be determined.
+
+  - name: business_items
+    source: business_items
+    type: string
+    description: Free-text list of business entities or concepts the agent works with (e.g. clients, tickets, invoices); many distinct values.
+    nullable: true
+
+measures:
+  - name: classified_agent_count
+    type: count
+    description: Number of agents with a classification row.
+    dimension: agent_id
+  - name: classified_agent_count_by_dimension
+    type: count
+    description: Number of agents per classification dimension value (slice by any dimension).
+    dimension: agent_id
