@@ -1,0 +1,6 @@
+value,top_prompts_pos,top_prompts_neg
+branching_workflow,execution_dataset=single_event_data 0.13; tone_and_persona=casual_friendly 0.09; data_flow_direction=processing 0.09,execution_dataset=single_asset_from_user -0.15; output_modality=structured_document -0.11; tone_and_persona=unknown -0.08
+multi_workflow_orchestration,execution_dataset=collection_scoped 0.23; data_flow_direction=bidirectional 0.19; functional_archetype=organizer 0.17,functional_archetype=creator -0.15; state_persistence=unknown -0.13; external_integration_scope=clickup_only -0.13
+sequential_workflow,execution_dataset=single_asset_from_user 0.22; functional_archetype=creator 0.16; data_flow_direction=outbound 0.14,execution_dataset=collection_scoped -0.12; autonomy_level=human_in_the_loop -0.12; data_flow_direction=processing -0.10
+single_action,implied_end_date=unknown 0.19; autonomy_level=unknown 0.18; tone_and_persona=unknown 0.17,implied_end_date=false -0.09
+unknown,data_flow_direction=unknown 0.93; functional_archetype=unknown 0.76; autonomy_level=unknown 0.74,team_orientation=individual -0.16; implied_end_date=false -0.08; external_integration_scope=clickup_only -0.07

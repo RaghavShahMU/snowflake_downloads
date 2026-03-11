@@ -1,0 +1,8 @@
+value,top_prompts_pos,top_prompts_neg
+analyzer,output_modality=messages 0.16; domain_industry_vertical=finance_accounting 0.14; external_integration_scope=web_research_integration 0.11,output_modality=visual_image -0.13; output_modality=task_artifact -0.13; domain_industry_vertical=creative_design -0.12
+communicator,output_modality=email_external_message 0.38; external_integration_scope=email_integration 0.30; data_flow_direction=bidirectional 0.15,external_integration_scope=clickup_only -0.16; output_modality=task_artifact -0.10; output_modality=structured_document -0.09
+creator,data_flow_direction=outbound 0.65; domain_knowledge_depth=moderate 0.49; output_modality=visual_image 0.48,data_flow_direction=processing -0.56; domain_industry_vertical=project_management_ops -0.50; domain_knowledge_depth=light -0.38
+enforcer,data_flow_direction=processing 0.16; execution_dataset=single_event_data 0.14; domain_knowledge_depth=deep 0.14,data_flow_direction=outbound -0.14; domain_knowledge_depth=moderate -0.11; autonomy_level=consultative -0.10
+monitor,output_modality=messages 0.32; domain_industry_vertical=project_management_ops 0.31; data_flow_direction=processing 0.29,domain_knowledge_depth=moderate -0.28; data_flow_direction=outbound -0.26; execution_dataset=single_user_prompt -0.23
+organizer,output_modality=task_artifact 0.48; data_flow_direction=processing 0.34; domain_industry_vertical=project_management_ops 0.25,data_flow_direction=outbound -0.44; output_modality=visual_image -0.25; domain_knowledge_depth=moderate -0.23
+unknown,data_flow_direction=unknown 0.79; operational_scope=unknown 0.76; autonomy_level=unknown 0.58,team_orientation=individual -0.13; implied_end_date=false -0.08; external_integration_scope=clickup_only -0.06

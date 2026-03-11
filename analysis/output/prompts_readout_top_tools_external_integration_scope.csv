@@ -1,0 +1,7 @@
+value,top_tools_pos,top_tools_neg
+calendar_integration,search_google_calendar 0.46; create_google_calendar_event 0.27; check_calendar_availability 0.17,—
+clickup_only,—,search_public_web -0.31; load_web_pages -0.28; search_google_calendar -0.23
+email_integration,gmail_create_draft 0.22; view_tools_catalog 0.21,—
+multiple_external_systems,search_google_calendar 0.22,—
+unknown,post_slack_message 0.30,—
+web_research_integration,search_public_web 0.38; load_web_pages 0.35,retrieve_tasks_by_filters -0.11

@@ -1,0 +1,5 @@
+value,top_prompts_pos,top_prompts_neg
+autonomous,functional_archetype=monitor 0.28; data_flow_direction=processing 0.18; domain_industry_vertical=project_management_ops 0.15,execution_dataset=single_user_prompt -0.22; functional_archetype=creator -0.17; domain_knowledge_depth=moderate -0.16
+consultative,execution_dataset=single_user_prompt 0.35; data_flow_direction=outbound 0.30; functional_archetype=creator 0.29,data_flow_direction=processing -0.28; functional_archetype=monitor -0.22; domain_industry_vertical=project_management_ops -0.21
+human_in_the_loop,functional_archetype=organizer 0.23; operational_scope=multi_workflow_orchestration 0.16; output_modality=task_artifact 0.14,data_flow_direction=outbound -0.18; execution_dataset=single_user_prompt -0.16; functional_archetype=creator -0.15
+unknown,operational_scope=unknown 0.74; data_flow_direction=unknown 0.72; functional_archetype=unknown 0.58,team_orientation=individual -0.19; implied_end_date=false -0.10; operational_scope=branching_workflow -0.07

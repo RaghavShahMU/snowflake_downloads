@@ -1,0 +1,6 @@
+value,top_prompts_pos,top_prompts_neg
+casual_friendly,domain_industry_vertical=creative_design 0.24; output_modality=visual_image 0.22; functional_archetype=creator 0.20,data_flow_direction=processing -0.15; domain_knowledge_depth=deep -0.14; domain_industry_vertical=project_management_ops -0.14
+empathetic_supportive,use_case_context=personal_use_case 0.35; domain_industry_vertical=education_academic 0.33; domain_industry_vertical=personal_productivity 0.16,domain_industry_vertical=project_management_ops -0.17; use_case_context=general_productivity -0.14; use_case_context=specific_use_case -0.14
+professional_formal,domain_industry_vertical=project_management_ops 0.25; data_flow_direction=processing 0.20; use_case_context=specific_use_case 0.16,functional_archetype=creator -0.24; use_case_context=personal_use_case -0.23; data_flow_direction=outbound -0.23
+technical_precise,domain_industry_vertical=it_engineering 0.23; functional_archetype=analyzer 0.10; domain_knowledge_depth=deep 0.08,operational_scope=branching_workflow -0.06; domain_knowledge_depth=none -0.05; domain_industry_vertical=education_academic -0.05
+unknown,autonomy_level=unknown 0.18; operational_scope=single_action 0.17; team_orientation=unknown 0.16,operational_scope=branching_workflow -0.08; implied_end_date=false -0.08; team_orientation=individual -0.06

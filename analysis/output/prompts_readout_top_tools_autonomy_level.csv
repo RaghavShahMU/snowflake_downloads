@@ -1,0 +1,4 @@
+value,top_tools_pos,top_tools_neg
+autonomous,todo_write 0.21; retrieve_tasks_by_filters 0.17; retrieve_activity 0.14,post_reply -0.18
+consultative,post_reply 0.24,todo_write -0.28; retrieve_tasks_by_filters -0.20; load_assets -0.14
+human_in_the_loop,load_assets 0.10,—

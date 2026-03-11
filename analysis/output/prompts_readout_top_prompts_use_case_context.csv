@@ -1,0 +1,8 @@
+value,top_prompts_pos,top_prompts_neg
+entertainment,domain_industry_vertical=creative_design 0.08; data_flow_direction=outbound 0.07; tone_and_persona=casual_friendly 0.06,data_flow_direction=processing -0.06; tone_and_persona=professional_formal -0.05
+general_productivity,domain_industry_vertical=project_management_ops 0.51; domain_knowledge_depth=light 0.38; domain_knowledge_depth=none 0.32,domain_knowledge_depth=moderate -0.44; domain_industry_vertical=education_academic -0.23; domain_industry_vertical=marketing_content -0.23
+personal_productivity,domain_industry_vertical=personal_productivity 0.38; tone_and_persona=casual_friendly 0.11; domain_industry_vertical=creative_design 0.09,tone_and_persona=professional_formal -0.15; domain_industry_vertical=project_management_ops -0.14; domain_industry_vertical=education_academic -0.07
+personal_use_case,domain_industry_vertical=education_academic 0.64; tone_and_persona=empathetic_supportive 0.35; functional_archetype=creator 0.22,domain_industry_vertical=project_management_ops -0.27; tone_and_persona=professional_formal -0.23; domain_knowledge_depth=light -0.16
+specific_use_case,domain_industry_vertical=marketing_content 0.30; domain_knowledge_depth=moderate 0.28; domain_knowledge_depth=deep 0.21,domain_knowledge_depth=none -0.27; domain_knowledge_depth=light -0.25; domain_industry_vertical=project_management_ops -0.25
+test_or_placeholder,implied_end_date=unknown 0.38; domain_industry_vertical=unknown 0.24; domain_knowledge_depth=unknown 0.22,implied_end_date=false -0.08
+unknown,domain_industry_vertical=unknown 0.41; implied_end_date=unknown 0.32; functional_archetype=unknown 0.31,implied_end_date=false -0.06; team_orientation=individual -0.05

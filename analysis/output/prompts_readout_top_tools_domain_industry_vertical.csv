@@ -1,0 +1,5 @@
+value,top_tools_pos,top_tools_neg
+creative_design,edit_image 0.26; generate_image 0.21; post_reply 0.18,todo_write -0.26; retrieve_tasks_by_filters -0.19; load_assets -0.15
+education_academic,—,todo_write -0.15; retrieve_tasks_by_filters -0.12
+personal_productivity,retrieve_personal_priorities 0.22; search_google_calendar 0.18,—
+project_management_ops,todo_write 0.28; retrieve_tasks_by_filters 0.26; retrieve_activity 0.21,post_reply -0.23; generate_image -0.12

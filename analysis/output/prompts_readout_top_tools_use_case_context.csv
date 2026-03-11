@@ -1,0 +1,4 @@
+value,top_tools_pos,top_tools_neg
+general_productivity,retrieve_activity 0.15; retrieve_tasks_by_filters 0.14; retrieve_personal_priorities 0.13,post_reply -0.11; search_public_web -0.10
+personal_use_case,post_reply 0.12,todo_write -0.12; retrieve_tasks_by_filters -0.10; retrieve_activity -0.09
+specific_use_case,load_assets 0.10; load_custom_fields 0.10,retrieve_personal_priorities -0.12; post_chat_message -0.10
