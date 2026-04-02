@@ -113,17 +113,24 @@ def main():
             OUTPUT_DIR / "classification_prompts_only_logistic_coefficients.csv", index=False
         )
         n_features_po = len(feature_cols_prompts_only)
+        plt.rcParams.update({
+            "font.size": 11,
+            "axes.titlesize": 13,
+            "axes.labelsize": 12,
+            "ytick.labelsize": 10,
+            "xtick.labelsize": 10,
+        })
         shap.summary_plot(shaps_po, X_only, plot_type="bar", show=False, max_display=n_features_po)
         fig = plt.gcf()
-        fig.set_size_inches(10, max(8, n_features_po * 0.22))
+        fig.set_size_inches(11, max(9, n_features_po * 0.28))
         plt.tight_layout()
-        plt.savefig(OUTPUT_DIR / "classification_prompts_only_shap_bar.png", dpi=150, bbox_inches="tight")
+        plt.savefig(OUTPUT_DIR / "classification_prompts_only_shap_bar.png", dpi=200, bbox_inches="tight")
         plt.close()
         shap.summary_plot(shaps_po, X_only, show=False, max_display=n_features_po)
         fig = plt.gcf()
-        fig.set_size_inches(10, max(8, n_features_po * 0.22))
+        fig.set_size_inches(11, max(9, n_features_po * 0.28))
         plt.tight_layout()
-        plt.savefig(OUTPUT_DIR / "classification_prompts_only_shap_beeswarm.png", dpi=150, bbox_inches="tight")
+        plt.savefig(OUTPUT_DIR / "classification_prompts_only_shap_beeswarm.png", dpi=200, bbox_inches="tight")
         plt.close()
         print(f"Wrote classification_prompts_only_* outputs (SHAP on full cohort, N={shaps_po.shape[0]:,} agents).")
 

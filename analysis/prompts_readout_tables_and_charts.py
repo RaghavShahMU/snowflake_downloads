@@ -20,12 +20,56 @@ DIMS_11 = [
     "external_integration_scope", "use_case_context", "implied_end_date",
 ]
 THRESHOLD = 0.05
-TOP_N = 3
+TOP_N = 6
+
+# Group related tools for leadership-readable table cells (5–6 tools max per group label).
+TOOL_GROUP = {
+    "todo_write": "Task & list work",
+    "retrieve_tasks_by_filters": "Task & list work",
+    "retrieve_activity": "Task & list work",
+    "update_task": "Task & list work",
+    "read_memory": "Task & list work",
+    "post_reply": "Chat & messaging",
+    "post_chat_message": "Chat & messaging",
+    "post_slack_message": "Chat & messaging",
+    "generate_image": "Media & creation",
+    "edit_image": "Media & creation",
+    "load_assets": "Docs & context",
+    "load_custom_fields": "Docs & context",
+    "create_document": "Docs & context",
+    "search_public_web": "Web research",
+    "load_web_pages": "Web research",
+    "search_google_calendar": "Calendar",
+    "create_google_calendar_event": "Calendar",
+    "check_calendar_availability": "Calendar",
+    "retrieve_personal_priorities": "Calendar & priorities",
+    "gmail_create_draft": "Email",
+    "view_tools_catalog": "Email & catalog",
+}
 
 
 def fmt_corr(rows):
-    """Format list of (name, r) as 'name r; name r'."""
-    return "; ".join(f"{name} {r:.2f}" for name, r in rows[:TOP_N])
+    """Cluster tools by group; show up to TOP_N tools total with group prefix."""
+    items = [(str(name), float(r)) for name, r in rows[:TOP_N]]
+    if not items:
+        return "—"
+    by_group: dict[str, list[tuple[str, float]]] = {}
+    for name, r in items:
+        g = TOOL_GROUP.get(name, "Other actions")
+        by_group.setdefault(g, []).append((name, r))
+    parts = []
+    for g in sorted(by_group.keys(), key=lambda x: (x == "Other actions", x)):
+        bits = ", ".join(f"{n} ({v:+.2f})" for n, v in by_group[g])
+        parts.append(f"{g}: {bits}")
+    return "; ".join(parts)
+
+
+def fmt_corr_prompt_features(rows):
+    """Top correlated prompt features; use dim_value labels (no '=')."""
+    items = [(str(name).replace("=", "_"), float(r)) for name, r in rows[:TOP_N]]
+    if not items:
+        return "—"
+    return "; ".join(f"{n} ({v:+.2f})" for n, v in items)
 
 
 def main():
@@ -82,8 +126,8 @@ def main():
                 neg = row[row <= -THRESHOLD].nsmallest(TOP_N)
                 rows_out.append({
                     "value": value,
-                    "top_prompts_pos": fmt_corr([(k, v) for k, v in pos.items()]) if len(pos) else "—",
-                    "top_prompts_neg": fmt_corr([(k, v) for k, v in neg.items()]) if len(neg) else "—",
+                    "top_prompts_pos": fmt_corr_prompt_features([(k, v) for k, v in pos.items()]) if len(pos) else "—",
+                    "top_prompts_neg": fmt_corr_prompt_features([(k, v) for k, v in neg.items()]) if len(neg) else "—",
                 })
             pd.DataFrame(rows_out).to_csv(OUTPUT_DIR / f"prompts_readout_top_prompts_{dim}.csv", index=False)
         print("Wrote prompts_readout_top_prompts_<dim>.csv")
@@ -103,24 +147,32 @@ def main():
         totals = df["total"].tolist()
         rates = (df["success_rate"] * 100).tolist()
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, max(4, len(values) * 0.5)))
+        plt.rcParams.update({
+            "font.size": 12,
+            "axes.titlesize": 13,
+            "axes.labelsize": 12,
+            "ytick.labelsize": 11,
+            "xtick.labelsize": 11,
+        })
+        row_h = max(0.55, min(0.85, 28 / max(len(values), 1)))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, max(5, len(values) * row_h)))
         y = np.arange(len(values))
         ax1.barh(y, totals, color="steelblue", alpha=0.8)
         ax1.set_yticks(y)
-        ax1.set_yticklabels(values, fontsize=9)
-        ax1.set_xlabel("Number of agents")
-        ax1.set_title(f"{dim}: agent count by value")
+        ax1.set_yticklabels(values, fontsize=11)
+        ax1.set_xlabel("Number of agents", fontsize=12)
+        ax1.set_title(f"{dim}: agent count", fontsize=13)
         ax1.invert_yaxis()
 
         ax2.barh(y, rates, color="seagreen", alpha=0.8)
         ax2.set_yticks(y)
-        ax2.set_yticklabels(values, fontsize=9)
-        ax2.set_xlabel("Success rate (%)")
-        ax2.set_title(f"{dim}: success rate by value")
+        ax2.set_yticklabels(values, fontsize=11)
+        ax2.set_xlabel("Success rate (%)", fontsize=12)
+        ax2.set_title(f"{dim}: success rate", fontsize=13)
         ax2.invert_yaxis()
         ax2.axvline(100 * 0.32, color="gray", linestyle="--", alpha=0.7, label="cohort avg")
         plt.tight_layout()
-        plt.savefig(OUTPUT_DIR / f"classification_dim_{dim}_bar.png", dpi=150, bbox_inches="tight")
+        plt.savefig(OUTPUT_DIR / f"classification_dim_{dim}_bar.png", dpi=200, bbox_inches="tight")
         plt.close()
     print("Wrote classification_dim_<dim>_bar.png")
     print("Done.")

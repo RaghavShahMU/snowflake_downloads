@@ -1,4 +1,4 @@
 value,top_tools_pos,top_tools_neg
-creator,post_reply 0.33; generate_image 0.21,todo_write -0.40; retrieve_tasks_by_filters -0.36; retrieve_activity -0.20
-monitor,retrieve_tasks_by_filters 0.36; todo_write 0.33; post_chat_message 0.33,post_reply -0.27
-organizer,update_task 0.20,—
+creator,Chat & messaging: post_reply (+0.33); Media & creation: generate_image (+0.21),"Chat & messaging: post_chat_message (-0.19); Docs & context: load_custom_fields (-0.18), load_assets (-0.17); Task & list work: todo_write (-0.40), retrieve_tasks_by_filters (-0.36), retrieve_activity (-0.20)"
+monitor,"Chat & messaging: post_chat_message (+0.33); Task & list work: retrieve_tasks_by_filters (+0.36), todo_write (+0.33), retrieve_activity (+0.31); Other actions: find_stale_tasks (+0.19)",Chat & messaging: post_reply (-0.27)
+organizer,Task & list work: update_task (+0.20),—

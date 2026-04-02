@@ -1,4 +1,4 @@
 value,top_tools_pos,top_tools_neg
-light,todo_write 0.21; retrieve_tasks_by_filters 0.19; retrieve_activity 0.16,post_reply -0.17
-moderate,post_reply 0.22,todo_write -0.25; retrieve_tasks_by_filters -0.24; retrieve_activity -0.17
-none,retrieve_personal_priorities 0.20; retrieve_tasks_by_filters 0.13; post_chat_message 0.12,—
+light,"Task & list work: todo_write (+0.21), retrieve_tasks_by_filters (+0.19), retrieve_activity (+0.16)",Chat & messaging: post_reply (-0.17)
+moderate,Chat & messaging: post_reply (+0.22),"Calendar & priorities: retrieve_personal_priorities (-0.13); Chat & messaging: post_chat_message (-0.15); Task & list work: todo_write (-0.25), retrieve_tasks_by_filters (-0.24), retrieve_activity (-0.17); Other actions: find_stale_tasks (-0.10)"
+none,Calendar & priorities: retrieve_personal_priorities (+0.20); Chat & messaging: post_chat_message (+0.12); Task & list work: retrieve_tasks_by_filters (+0.13),—

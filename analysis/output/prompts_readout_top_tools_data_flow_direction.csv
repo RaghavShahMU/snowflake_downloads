@@ -1,4 +1,4 @@
 value,top_tools_pos,top_tools_neg
-bidirectional,search_google_calendar 0.23; view_tools_catalog 0.21,—
-outbound,post_reply 0.27; generate_image 0.18,todo_write -0.35; retrieve_tasks_by_filters -0.30; load_assets -0.20
-processing,todo_write 0.29; retrieve_tasks_by_filters 0.28; load_assets 0.19,post_reply -0.24; generate_image -0.15
+bidirectional,Calendar: search_google_calendar (+0.23); Email & catalog: view_tools_catalog (+0.21),—
+outbound,Chat & messaging: post_reply (+0.27); Media & creation: generate_image (+0.18),"Docs & context: load_assets (-0.20), load_custom_fields (-0.17); Task & list work: todo_write (-0.35), retrieve_tasks_by_filters (-0.30), retrieve_activity (-0.15); Other actions: search_workspace (-0.15)"
+processing,"Docs & context: load_assets (+0.19), load_custom_fields (+0.17); Task & list work: todo_write (+0.29), retrieve_tasks_by_filters (+0.28)",Chat & messaging: post_reply (-0.24); Media & creation: generate_image (-0.15)
