@@ -5,6 +5,7 @@ Runs distribution, population, RF, SHAP, SHAP beeswarm (by group), average SHAP 
 Exports all features (no cap). Correlation section: four matrices with annotated heatmaps.
 Scope: classified agents only.
 """
+import json
 import duckdb
 import pandas as pd
 import numpy as np
@@ -30,6 +31,73 @@ CLASS_DIMS = [
 SHAP_SAMPLE_SIZE = 500
 CELL_SIZE_INCH = 0.35  # for correlation heatmaps
 DPI = 150
+
+
+def _columns_for_corr_axis(axis_id, class_cols, tool_cols, trigger_cols, template_cols):
+    if axis_id == "tools":
+        return list(tool_cols)
+    if axis_id == "triggers":
+        return list(trigger_cols)
+    if axis_id == "templates":
+        return list(template_cols)
+    prefix = axis_id + "="
+    return [c for c in class_cols if str(c).startswith(prefix)]
+
+
+def export_leadership_correlation_grid(
+    corr_mat,
+    class_cols,
+    tool_cols,
+    trigger_cols,
+    template_cols,
+    output_dir,
+    dpi=150,
+):
+    """One heatmap per axis pair (each classification dim, tools, triggers, templates); writes leadership_corr_heatmap_map.json."""
+    manifest = {}
+    dim_ids = [d for d in CLASS_DIMS if any(str(c).startswith(d + "=") for c in class_cols)]
+    axis_ids = dim_ids + ["tools", "triggers", "templates"]
+    for rid in axis_ids:
+        rcols = _columns_for_corr_axis(rid, class_cols, tool_cols, trigger_cols, template_cols)
+        if not rcols:
+            continue
+        for cid in axis_ids:
+            ccols = _columns_for_corr_axis(cid, class_cols, tool_cols, trigger_cols, template_cols)
+            if not ccols:
+                continue
+            try:
+                sub = corr_mat.loc[rcols, ccols]
+            except (KeyError, ValueError):
+                continue
+            if sub.shape[0] == 0 or sub.shape[1] == 0:
+                continue
+            base = f"full_feature_corr_heatmap_rows_{rid}_cols_{cid}"
+            png_path = output_dir / f"{base}.png"
+            csv_path = output_dir / f"{base}.csv"
+            sub.to_csv(csv_path)
+            n_r, n_c = sub.shape
+            use_annot = n_r * n_c <= 625
+            annot_font = 5 if max(n_r, n_c) <= 28 else 4
+            fig_w = max(6, min(48, n_c * CELL_SIZE_INCH * 0.55))
+            fig_h = max(6, min(48, n_r * CELL_SIZE_INCH * 0.55))
+            fig, ax = plt.subplots(figsize=(fig_w, fig_h))
+            kw = dict(ax=ax, cmap="RdBu_r", center=0, vmin=-1, vmax=1, square=False)
+            if use_annot:
+                sns.heatmap(
+                    sub, annot=True, fmt=".2f", annot_kws={"size": annot_font}, **kw,
+                )
+            else:
+                sns.heatmap(sub, annot=False, **kw)
+            ax.set_title(f"Rows: {rid} × Cols: {cid}")
+            plt.xticks(rotation=90, ha="right", fontsize=max(3, annot_font - 1))
+            plt.yticks(fontsize=max(3, annot_font - 1))
+            plt.tight_layout()
+            plt.savefig(png_path, dpi=dpi, bbox_inches="tight")
+            plt.close()
+            manifest[f"{rid}|{cid}"] = f"{base}.png"
+    mp = output_dir / "leadership_corr_heatmap_map.json"
+    mp.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
+    print(f"Wrote {len(manifest)} leadership correlation slices and {mp.name}")
 
 
 def main():
@@ -393,6 +461,98 @@ def main():
         OUTPUT_DIR / "full_feature_corr_prompts_vs_templates.csv",
         OUTPUT_DIR / "full_feature_corr_heatmap_prompts_vs_templates.png",
         "Prompts vs Templates",
+    )
+
+    # Leadership readout matrix explorer: transposes and variable blocks
+    save_heatmap(
+        corr_pt.T,
+        OUTPUT_DIR / "full_feature_corr_tools_vs_prompts.csv",
+        OUTPUT_DIR / "full_feature_corr_heatmap_tools_vs_prompts.png",
+        "Tools vs Prompts",
+        annot_font=5,
+    )
+    save_heatmap(
+        corr_ptr.T,
+        OUTPUT_DIR / "full_feature_corr_triggers_vs_prompts.csv",
+        OUTPUT_DIR / "full_feature_corr_heatmap_triggers_vs_prompts.png",
+        "Triggers vs Prompts",
+    )
+    save_heatmap(
+        corr_ptm.T,
+        OUTPUT_DIR / "full_feature_corr_templates_vs_prompts.csv",
+        OUTPUT_DIR / "full_feature_corr_heatmap_templates_vs_prompts.png",
+        "Templates vs Prompts",
+    )
+    if len(tool_cols) > 0:
+        corr_tt = corr_mat.loc[tool_cols, tool_cols]
+        save_heatmap(
+            corr_tt,
+            OUTPUT_DIR / "full_feature_corr_tools_vs_tools.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_tools_vs_tools.png",
+            "Tools vs Tools",
+            annot_font=4,
+        )
+    if len(trigger_cols) > 0:
+        corr_trtr = corr_mat.loc[trigger_cols, trigger_cols]
+        save_heatmap(
+            corr_trtr,
+            OUTPUT_DIR / "full_feature_corr_triggers_vs_triggers.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_triggers_vs_triggers.png",
+            "Triggers vs Triggers",
+        )
+    if len(template_cols) > 0:
+        corr_tm = corr_mat.loc[template_cols, template_cols]
+        save_heatmap(
+            corr_tm,
+            OUTPUT_DIR / "full_feature_corr_templates_vs_templates.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_templates_vs_templates.png",
+            "Templates vs Templates",
+        )
+    if len(tool_cols) > 0 and len(trigger_cols) > 0:
+        corr_ttr = corr_mat.loc[tool_cols, trigger_cols]
+        save_heatmap(
+            corr_ttr,
+            OUTPUT_DIR / "full_feature_corr_tools_vs_triggers.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_tools_vs_triggers.png",
+            "Tools vs Triggers",
+        )
+        save_heatmap(
+            corr_ttr.T,
+            OUTPUT_DIR / "full_feature_corr_triggers_vs_tools.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_triggers_vs_tools.png",
+            "Triggers vs Tools",
+        )
+    if len(tool_cols) > 0 and len(template_cols) > 0:
+        corr_ttm = corr_mat.loc[tool_cols, template_cols]
+        save_heatmap(
+            corr_ttm,
+            OUTPUT_DIR / "full_feature_corr_tools_vs_templates.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_tools_vs_templates.png",
+            "Tools vs Templates",
+        )
+        save_heatmap(
+            corr_ttm.T,
+            OUTPUT_DIR / "full_feature_corr_templates_vs_tools.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_templates_vs_tools.png",
+            "Templates vs Tools",
+        )
+    if len(trigger_cols) > 0 and len(template_cols) > 0:
+        corr_trtm = corr_mat.loc[trigger_cols, template_cols]
+        save_heatmap(
+            corr_trtm,
+            OUTPUT_DIR / "full_feature_corr_triggers_vs_templates.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_triggers_vs_templates.png",
+            "Triggers vs Templates",
+        )
+        save_heatmap(
+            corr_trtm.T,
+            OUTPUT_DIR / "full_feature_corr_templates_vs_triggers.csv",
+            OUTPUT_DIR / "full_feature_corr_heatmap_templates_vs_triggers.png",
+            "Templates vs Triggers",
+        )
+
+    export_leadership_correlation_grid(
+        corr_mat, class_cols, tool_cols, trigger_cols, template_cols, OUTPUT_DIR, dpi=DPI,
     )
 
     print("Wrote correlation matrices and heatmaps")

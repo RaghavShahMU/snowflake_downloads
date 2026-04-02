@@ -57,6 +57,7 @@ Three HTML readouts with embedded tables, charts, and graphs are published via G
 | **Agent success and retention** | Success criteria, triggers, tools, prompts (classifications), retention insights | [View readout](https://raghavshahmu.github.io/snowflake_downloads/docs/agent_success_retention_readout_plain.html) |
 | **Prompts-only classification** | 14 classification dimensions: distribution, direction (RF/SHAP/logistic), correlation with tools/triggers/templates | [View readout](https://raghavshahmu.github.io/snowflake_downloads/docs/prompts_classification_readout_plain.html) |
 | **Full-feature exhaustive** | All features (prompts, triggers, templates, tools): distribution, RF, SHAP, logistic, correlation matrices | [View readout](https://raghavshahmu.github.io/snowflake_downloads/docs/full_feature_readout_plain.html) |
+| **Prompts SHAP (full sample)** | SHAP for prompts-only model on **full classified cohort** (no 500 cap): direction, beeswarm, bar, average SHAP per feature value | [View readout](https://raghavshahmu.github.io/snowflake_downloads/docs/prompts_shap_full_sample_readout_plain.html) · [MD](docs/prompts_shap_full_sample_readout.md) |
 
 *Links work after the repo is pushed and GitHub Pages is enabled (Settings → Pages → Source: Deploy from branch → main → / (root)).*
 

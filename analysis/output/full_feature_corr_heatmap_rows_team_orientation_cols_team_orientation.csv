@@ -1,0 +1,5 @@
+,team_orientation=individual,team_orientation=larger_team,team_orientation=small_team,team_orientation=unknown
+team_orientation=individual,1.0,-0.5708342153028069,-0.7330055876396255,-0.3331206491503079
+team_orientation=larger_team,-0.5708342153028069,1.0,-0.019439165355332307,-0.008834294705666315
+team_orientation=small_team,-0.7330055876396255,-0.019439165355332307,1.0,-0.011344077156750653
+team_orientation=unknown,-0.3331206491503079,-0.008834294705666315,-0.011344077156750653,1.0

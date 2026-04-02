@@ -53,7 +53,7 @@
 
 - Reference date is set in config (2026-03-10). Cohort and run/tool data are as of the CSV export used for the run.
 - TRIGGER_SOURCE may include `\N` (normalized to "unknown" where needed). Segment definitions are simplifications (e.g. dormant vs success is usage-based; we do not model time-to-failure).
-- RF and logistic models use resampled (trigger) or full (tool, classification) data; SHAP is on a sample (e.g. 500 agents) for speed. Directional interpretation uses signed mean SHAP and logistic coefficients together.
+- RF and logistic models use resampled (trigger) or full (tool, classification) data. For **trigger and full classification model**, SHAP is on a sample (e.g. 500 agents) for speed. For the **prompts-only model**, SHAP is computed on the **full classified cohort** (all agents); beeswarm and average SHAP per feature value include **all** one-hot prompt features. Directional interpretation uses signed mean SHAP and logistic coefficients together.
 
 ---
 
@@ -140,7 +140,7 @@ Dormant agents (86,437) outnumber success (39,606) and failure (30,889) combined
 
 ### 5.5 Prompts-only analysis (no trigger, no template)
 
-Model uses **only** one-hot encoded classification dimensions (LLM-derived prompt dimensions). No trigger or template features. Same cohort (113,863 classified agents).
+Model uses **only** one-hot encoded classification dimensions (LLM-derived prompt dimensions). No trigger or template features. Same cohort (113,863 classified agents). **SHAP for this model is computed on the full classified cohort** (no sample cap); beeswarm and average SHAP per feature value include all one-hot prompt features. See [Prompts SHAP full sample readout](prompts_shap_full_sample_readout.md) for the dedicated full-sample SHAP report.
 
 **Tables, graphs, visuals:**  
 - RF importance: `classification_prompts_only_rf_importance.csv`  

@@ -1,0 +1,5 @@
+,template_is_custom,template_is_templated,template=custom,template=unknown
+template_is_custom,1.0,,1.0,-1.0
+template_is_templated,,,,
+template=custom,1.0,,1.0,-1.0
+template=unknown,-1.0,,-1.0,1.0

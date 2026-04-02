@@ -1,0 +1,5 @@
+,autonomy_level=autonomous,autonomy_level=consultative,autonomy_level=human_in_the_loop,autonomy_level=unknown
+autonomy_level=autonomous,1.0,-0.7143254264679714,-0.39088786580527085,-0.04907284752193446
+autonomy_level=consultative,-0.7143254264679714,1.0,-0.35648542554279006,-0.04475389609604185
+autonomy_level=human_in_the_loop,-0.39088786580527085,-0.35648542554279006,1.0,-0.024489895337971645
+autonomy_level=unknown,-0.04907284752193446,-0.04475389609604185,-0.024489895337971645,1.0

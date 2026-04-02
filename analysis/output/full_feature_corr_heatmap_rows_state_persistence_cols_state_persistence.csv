@@ -1,0 +1,5 @@
+,state_persistence=state_accumulating,state_persistence=state_referencing,state_persistence=stateless,state_persistence=unknown
+state_persistence=state_accumulating,1.0,-0.09429312814063463,-0.02043509857197723,-0.76417042522542
+state_persistence=state_referencing,-0.09429312814063463,1.0,-0.014798328205573969,-0.5533834210609565
+state_persistence=stateless,-0.02043509857197723,-0.014798328205573969,1.0,-0.1199286202554724
+state_persistence=unknown,-0.76417042522542,-0.5533834210609565,-0.1199286202554724,1.0

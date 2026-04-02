@@ -74,25 +74,29 @@ def main():
             {"feature": feature_cols_prompts_only, "importance": model_po.feature_importances_}
         ).sort_values("importance", ascending=False)
         importance_po.to_csv(OUTPUT_DIR / "classification_prompts_only_rf_importance.csv", index=False)
-        sample_size_po = min(500, len(X_only))
-        X_shap_po = X_only.sample(n=sample_size_po, random_state=42) if len(X_only) > sample_size_po else X_only
-        explainer_po = shap.TreeExplainer(model_po, X_shap_po)
-        shaps_po = explainer_po.shap_values(X_shap_po)
+        # SHAP on full cohort: all agents in agent_classifications (~114K). Use a background sample for TreeExplainer to save memory; shap_values(X_only) returns SHAP for every agent.
+        n_agents_full = len(X_only)
+        print(f"Prompts-only SHAP: full classified cohort N = {n_agents_full:,} agents (no 500 limit). Computing SHAP for all agents...")
+        background_size = min(2000, n_agents_full)
+        X_background = X_only.sample(n=background_size, random_state=42) if n_agents_full > background_size else X_only
+        explainer_po = shap.TreeExplainer(model_po, X_background)
+        shaps_po = explainer_po.shap_values(X_only)  # SHAP for every row in X_only (~114K)
         if isinstance(shaps_po, list):
             shaps_po = shaps_po[1]
         if shaps_po.ndim == 3:
             shaps_po = shaps_po[:, :, 1]
+        print(f"SHAP matrix shape: {shaps_po.shape[0]:,} agents x {shaps_po.shape[1]} features.")
         mean_abs_po = np.abs(shaps_po).mean(axis=0)
         mean_signed_po = shaps_po.mean(axis=0)
         shap_dir_po = pd.DataFrame(
-            {"feature": X_shap_po.columns, "mean_shap": mean_signed_po, "mean_abs_shap": mean_abs_po}
+            {"feature": X_only.columns, "mean_shap": mean_signed_po, "mean_abs_shap": mean_abs_po}
         )
         shap_dir_po.to_csv(OUTPUT_DIR / "classification_prompts_only_shap_direction.csv", index=False)
         shap_by_val_po = []
-        for col in X_shap_po.columns:
-            col_idx = list(X_shap_po.columns).index(col)
+        for col in X_only.columns:
+            col_idx = list(X_only.columns).index(col)
             for val in [0, 1]:
-                mask = (X_shap_po[col].values == val)
+                mask = (X_only[col].values == val)
                 if mask.sum() == 0:
                     continue
                 shap_by_val_po.append({
@@ -108,15 +112,20 @@ def main():
         pd.DataFrame({"feature": X_only.columns, "coefficient": lr_po.coef_[0]}).to_csv(
             OUTPUT_DIR / "classification_prompts_only_logistic_coefficients.csv", index=False
         )
-        shap.summary_plot(shaps_po, X_shap_po, plot_type="bar", show=False, max_display=20)
+        n_features_po = len(feature_cols_prompts_only)
+        shap.summary_plot(shaps_po, X_only, plot_type="bar", show=False, max_display=n_features_po)
+        fig = plt.gcf()
+        fig.set_size_inches(10, max(8, n_features_po * 0.22))
         plt.tight_layout()
         plt.savefig(OUTPUT_DIR / "classification_prompts_only_shap_bar.png", dpi=150, bbox_inches="tight")
         plt.close()
-        shap.summary_plot(shaps_po, X_shap_po, show=False, max_display=20)
+        shap.summary_plot(shaps_po, X_only, show=False, max_display=n_features_po)
+        fig = plt.gcf()
+        fig.set_size_inches(10, max(8, n_features_po * 0.22))
         plt.tight_layout()
         plt.savefig(OUTPUT_DIR / "classification_prompts_only_shap_beeswarm.png", dpi=150, bbox_inches="tight")
         plt.close()
-        print("Wrote classification_prompts_only_* outputs")
+        print(f"Wrote classification_prompts_only_* outputs (SHAP on full cohort, N={shaps_po.shape[0]:,} agents).")
 
     # Trigger: primary trigger per agent from runs (for classified agents only)
     run_trigger = con.execute(
