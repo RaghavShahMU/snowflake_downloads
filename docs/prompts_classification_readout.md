@@ -9,13 +9,12 @@
 
 ## Executive summary
 
-- **Purpose:** Link **prompt classifications** to **success vs non-success** (same cohort definitions as the main agent success readout).
-- **Prompts-only model:** **Random Forest**, **SHAP**, and **logistic regression** on one-hot classification features only (no triggers/templates in that model).
-- **Correlation blocks:** Agent-level **Pearson** between prompt dimensions and tools/triggers/templates (|r| ≥ 0.05 in dimension tables).
-- **Cohort size:** Classified agents with segment counts below; ~**114K** prompts in classification pass.
-- **Lead takeaway:** **Collection-scoped** execution and **monitor** archetype align with success; **single-user prompt** execution and **creator** archetype align with lower modeled success—details in **Key findings**.
+- **Success concentrates in “operator” prompts, not “chatbot” prompts.** **collection_scoped** and **collection_unbounded** show **~57–59%** success vs **single_user_prompt ~11%** and **single_asset_from_user ~8%**. **Monitor** sits near **67%** success; **creator** (the most common archetype) sits near **12%**. The prompts-only model ranks execution scope and archetype at the top of feature importance in the same direction.
+- **Bias templates and onboarding toward bounded queue work and observation jobs.** Copy that reads like a defined list/time window and “watch and report” matches the strongest population slices; one-off Q&amp;A and pure generative framing match the weakest.
+- **Orchestration, in-platform processing, and integrations are the next levers.** **multi_workflow_orchestration ~59%** success vs **sequential_workflow ~22%**. **Processing** and **bidirectional** sit **~42–49%** vs **outbound ~18%**. Prompts implying email, calendar, or multiple external systems sit **~49–52%** vs **clickup_only ~31%**.
+- **Vertical, modality, and domain-depth wording matter for GTM.** The model flags **visual_image**, **creative_design**, and **education_academic** negatively; **marketing_content**, **project_management_ops**, and **personal_productivity** positively. **Moderate** domain depth is the largest slice but **~22%** success vs **light** / **none** near **~43–44%**—favor simpler operational defaults.
 
-**Detailed data analysis and methodologies** — See [Methodology and footnotes](#methodology-and-footnotes).
+Methodology: [Methodology and footnotes](#methodology-and-footnotes).
 
 ## Key findings
 
@@ -111,9 +110,26 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 </details>
 
 <details>
-<summary><strong>Finding 3 — Prompt × tool/trigger links</strong> — <em>See the HTML readout for a short list of non-obvious pairs; many top |r| values are label–instrument matches.</em></summary>
+<summary><strong>Finding 3 — Workflow depth, data gravity, and connectivity</strong> — <em>Orchestration and in-platform work outperform sequential pipelines and outbound-only framing; integrations and verticals split outcomes.</em></summary>
 
-The largest correlations often repeat the classification wording (“web research” with search tools, “structured document” with document tools). The **Highlighted correlations** section in `prompts_classification_readout_plain.html` focuses on cross-cutting patterns (creator vs. queue tooling, outbound vs. task hygiene, etc.).
+- **Operational scope:** **multi_workflow_orchestration** is a small share but **~59%** success vs **sequential_workflow ~22%**. Prompts-only model: strong positive coefficient on multi-workflow, negative on sequential.
+- **Data flow:** **Outbound ~18%** success vs **processing ~42%** and **bidirectional ~49%**. Outbound has high RF importance but near-zero logistic; processing/bidirectional are cleaner positives in coefficients.
+- **Domain knowledge depth:** **Moderate** is the modal bucket (**~22%** success) vs **light** / **none** **~43–44%**. Model treats moderate as a drag and light as a lift.
+- **External integration:** **clickup_only ~31%** vs email / calendar / **multiple_external_systems ~49–52%**.
+- **Vertical, modality, use case, autonomy:** Strong model negatives on **visual_image**, **creative_design**, **education_academic**; positives on marketing, PM/Ops, personal productivity, **task_artifact**, **messages**. **general_productivity ~37%** vs **personal_use_case ~19%** and **entertainment ~16%**. **Consultative** negative and **autonomous** positive in logistic terms.
+
+**Snapshot — population success rates (selected contrasts)**
+
+| Contrast | Higher-success side (rate) | Lower-success side (rate) |
+|----------|----------------------------|---------------------------|
+| Operational scope | multi_workflow_orchestration (~0.59) | sequential_workflow (~0.22) |
+| Data flow | bidirectional (~0.49), processing (~0.42) | outbound (~0.18) |
+| Domain depth | light / none (~0.43–0.44) | moderate (~0.22) |
+| Integration | email / calendar / multiple_external (~0.49–0.52) | clickup_only (~0.31) |
+| Use case (sample) | general_productivity (~0.37) | personal_use_case (~0.19), entertainment (~0.16) |
+
+Cross-cutting prompt×tool patterns: see **Highlighted correlations** in [prompts_classification_readout_plain.html](prompts_classification_readout_plain.html). Full dimension tables: [Other classification dimensions](#other-classification-dimensions) and [Methodology](#methodology-and-footnotes).
+
 </details>
 
 ---
