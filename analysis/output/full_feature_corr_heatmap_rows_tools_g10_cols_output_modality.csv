@@ -1,0 +1,2 @@
+,output_modality=email_external_message,output_modality=messages,output_modality=structured_document,output_modality=task_artifact,output_modality=unknown,output_modality=visual_image
+write_memory,0.01566992138732986,0.010401279740562206,0.009180364906024054,0.010852917974218322,0.009879691536258164,-0.046370934717992036

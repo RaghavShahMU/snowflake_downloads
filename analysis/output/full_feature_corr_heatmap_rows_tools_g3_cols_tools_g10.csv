@@ -1,0 +1,7 @@
+,write_memory
+edit_image,0.010365981328685572
+find_similar_assets,-0.001841749488420705
+find_stale_tasks,0.008593279173911717
+follow_up_cursor_agent,-0.0015675465719188141
+generate_image,0.005345113623302856
+generate_project_summary,0.005181987510094721

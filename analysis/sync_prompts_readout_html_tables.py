@@ -18,15 +18,15 @@ MD_PATH = REPO / "semantic_layer" / "models" / "agent_classifications.md"
 SECTIONS = [
     ("2-execution-dataset", "execution_dataset"),
     ("1-functional-archetype", "functional_archetype"),
-    ("3-domain-knowledge-depth", "domain_knowledge_depth"),
-    ("4-operational-scope", "operational_scope"),
-    ("5-data-flow-direction", "data_flow_direction"),
-    ("6-autonomy-level", "autonomy_level"),
-    ("7-tone-and-persona", "tone_and_persona"),
-    ("8-domain-industry-vertical", "domain_industry_vertical"),
-    ("9-external-integration-scope", "external_integration_scope"),
-    ("10-use-case-context", "use_case_context"),
-    ("11-implied-end-date", "implied_end_date"),
+    ("domain-knowledge-depth", "domain_knowledge_depth"),
+    ("operational-scope", "operational_scope"),
+    ("data-flow-direction", "data_flow_direction"),
+    ("autonomy-level", "autonomy_level"),
+    ("tone-and-persona", "tone_and_persona"),
+    ("domain-industry-vertical", "domain_industry_vertical"),
+    ("external-integration-scope", "external_integration_scope"),
+    ("use-case-context", "use_case_context"),
+    ("implied-end-date", "implied_end_date"),
 ]
 
 DIM_REGEX = re.compile(
@@ -176,7 +176,7 @@ def patch_distribution_tables(text: str, descriptions: dict[str, dict[str, str]]
 
 
 def wrap_appendix(text: str) -> str:
-    if "Full detail — dimensions 3–11" in text:
+    if "Full detail — additional dimensions" in text:
         return text
     start = text.find('<h2 id="other-classification-dimensions">')
     if start == -1:
@@ -192,7 +192,7 @@ def wrap_appendix(text: str) -> str:
     )
     wrapped = (
         '<h2 id="other-classification-dimensions">Other classification dimensions</h2>\n'
-        "<details><summary><strong>Full detail — dimensions 3–11</strong> "
+        "<details><summary><strong>Full detail — additional dimensions</strong> "
         "(open only if you need the full tables)</summary>\n"
         + inner.strip()
         + "\n</details>\n\n"

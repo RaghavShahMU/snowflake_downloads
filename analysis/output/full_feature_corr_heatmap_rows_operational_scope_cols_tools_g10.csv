@@ -1,0 +1,6 @@
+,write_memory
+operational_scope=branching_workflow,-0.027677264603869434
+operational_scope=multi_workflow_orchestration,0.04970293149244573
+operational_scope=sequential_workflow,-0.001861519217192873
+operational_scope=single_action,-4.724360217593586e-05
+operational_scope=unknown,-0.0002547284717231539

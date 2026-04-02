@@ -1,0 +1,7 @@
+,write_memory
+create_document_page,0.016201124491669733
+create_google_calendar_event,0.025047679511543113
+create_list,0.012848663064102943
+create_subtask,0.009012407301130029
+create_task,0.02832409625938626
+delete_memory,0.06339645326764583

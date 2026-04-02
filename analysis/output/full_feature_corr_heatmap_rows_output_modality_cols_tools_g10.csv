@@ -1,0 +1,7 @@
+,write_memory
+output_modality=email_external_message,0.01566992138732986
+output_modality=messages,0.010401279740562206
+output_modality=structured_document,0.009180364906024054
+output_modality=task_artifact,0.010852917974218322
+output_modality=unknown,0.009879691536258164
+output_modality=visual_image,-0.046370934717992036

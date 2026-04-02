@@ -1,0 +1,7 @@
+,write_memory
+execution_dataset=collection_scoped,0.06825033555541156
+execution_dataset=collection_unbounded,0.03573270631998714
+execution_dataset=single_asset_from_user,-0.039162385184915056
+execution_dataset=single_event_data,-0.033742998259357136
+execution_dataset=single_user_prompt,-0.03623037875712524
+execution_dataset=unknown,0.010656452495720538

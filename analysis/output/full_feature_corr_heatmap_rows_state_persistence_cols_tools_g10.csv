@@ -1,0 +1,5 @@
+,write_memory
+state_persistence=state_accumulating,0.06089961411747065
+state_persistence=state_referencing,0.033526818797194644
+state_persistence=stateless,-0.004094716840153082
+state_persistence=unknown,-0.07099872070436768

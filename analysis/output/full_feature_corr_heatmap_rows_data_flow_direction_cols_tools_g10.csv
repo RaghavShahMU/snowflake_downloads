@@ -1,0 +1,6 @@
+,write_memory
+data_flow_direction=bidirectional,0.061141126753595565
+data_flow_direction=inbound,0.005918037170397521
+data_flow_direction=outbound,-0.04025373819160269
+data_flow_direction=processing,0.007658043795953029
+data_flow_direction=unknown,0.00019123266820083345

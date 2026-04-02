@@ -31,17 +31,33 @@ CLASS_DIMS = [
 SHAP_SAMPLE_SIZE = 500
 CELL_SIZE_INCH = 0.35  # for correlation heatmaps
 DPI = 150
+# Leadership readout: split tools into row/col blocks so heatmaps stay legible in the HTML explorer.
+TOOL_GROUP_SIZE = 6
+TOOL_GROUP_PREFIX = "tools_g"
 
 
-def _columns_for_corr_axis(axis_id, class_cols, tool_cols, trigger_cols, template_cols):
-    if axis_id == "tools":
-        return list(tool_cols)
-    if axis_id == "triggers":
-        return list(trigger_cols)
-    if axis_id == "templates":
-        return list(template_cols)
-    prefix = axis_id + "="
-    return [c for c in class_cols if str(c).startswith(prefix)]
+def _split_tool_columns_into_groups(tool_cols, per_group=TOOL_GROUP_SIZE):
+    cols = sorted(str(c) for c in tool_cols)
+    if not cols:
+        return []
+    groups = []
+    for i in range(0, len(cols), per_group):
+        chunk = cols[i : i + per_group]
+        groups.append((f"{TOOL_GROUP_PREFIX}{len(groups) + 1}", chunk))
+    return groups
+
+
+def _build_leadership_axis_map(class_cols, tool_cols, trigger_cols, template_cols, tool_group_size=TOOL_GROUP_SIZE):
+    dim_ids = [d for d in CLASS_DIMS if any(str(c).startswith(d + "=") for c in class_cols)]
+    axis_map = {}
+    for d in dim_ids:
+        axis_map[d] = [c for c in class_cols if str(c).startswith(d + "=")]
+    tool_groups = _split_tool_columns_into_groups(tool_cols, per_group=tool_group_size)
+    for gid, chunk in tool_groups:
+        axis_map[gid] = chunk
+    axis_map["triggers"] = list(trigger_cols)
+    axis_map["templates"] = list(template_cols)
+    return dim_ids, tool_groups, axis_map
 
 
 def export_leadership_correlation_grid(
@@ -52,17 +68,31 @@ def export_leadership_correlation_grid(
     template_cols,
     output_dir,
     dpi=150,
+    tool_group_size=TOOL_GROUP_SIZE,
 ):
-    """One heatmap per axis pair (each classification dim, tools, triggers, templates); writes leadership_corr_heatmap_map.json."""
+    """One heatmap per axis pair (dims, tools in ~6-column groups, triggers, templates); writes leadership_corr_heatmap_map.json."""
+    dim_ids, tool_groups, axis_map = _build_leadership_axis_map(
+        class_cols, tool_cols, trigger_cols, template_cols, tool_group_size=tool_group_size,
+    )
+    axis_ids = dim_ids + [g[0] for g in tool_groups] + ["triggers", "templates"]
+    axis_ids = [a for a in axis_ids if axis_map.get(a)]
+
+    tool_axis_options = [
+        {"value": gid, "label": f"Tools group {i + 1}"}
+        for i, (gid, chunk) in enumerate(tool_groups)
+    ]
+    (output_dir / "leadership_corr_tool_axis_options.json").write_text(
+        json.dumps(tool_axis_options, indent=2),
+        encoding="utf-8",
+    )
+
     manifest = {}
-    dim_ids = [d for d in CLASS_DIMS if any(str(c).startswith(d + "=") for c in class_cols)]
-    axis_ids = dim_ids + ["tools", "triggers", "templates"]
     for rid in axis_ids:
-        rcols = _columns_for_corr_axis(rid, class_cols, tool_cols, trigger_cols, template_cols)
+        rcols = axis_map.get(rid) or []
         if not rcols:
             continue
         for cid in axis_ids:
-            ccols = _columns_for_corr_axis(cid, class_cols, tool_cols, trigger_cols, template_cols)
+            ccols = axis_map.get(cid) or []
             if not ccols:
                 continue
             try:
@@ -97,7 +127,10 @@ def export_leadership_correlation_grid(
             manifest[f"{rid}|{cid}"] = f"{base}.png"
     mp = output_dir / "leadership_corr_heatmap_map.json"
     mp.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
-    print(f"Wrote {len(manifest)} leadership correlation slices and {mp.name}")
+    print(
+        f"Wrote {len(manifest)} leadership correlation slices, {mp.name}, "
+        f"and leadership_corr_tool_axis_options.json ({len(tool_axis_options)} tool groups)",
+    )
 
 
 def main():

@@ -1,0 +1,7 @@
+,write_memory
+list_available_calendars,0.004669887945553438
+load_assets,0.06441897801306626
+load_custom_fields,0.0183064199526688
+load_web_pages,0.028467845073912364
+manage_personal_priorities,0.008069883499128284
+move_task_to_list,0.017326467771959023

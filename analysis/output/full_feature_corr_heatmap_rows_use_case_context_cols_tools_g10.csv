@@ -1,0 +1,8 @@
+,write_memory
+use_case_context=entertainment,-0.005435938361872472
+use_case_context=general_productivity,-0.020040541905311692
+use_case_context=personal_productivity,0.012504048749303396
+use_case_context=personal_use_case,-0.027715598966436564
+use_case_context=specific_use_case,0.03424291289839011
+use_case_context=test_or_placeholder,0.0014894839025728134
+use_case_context=unknown,-0.003078372913736472

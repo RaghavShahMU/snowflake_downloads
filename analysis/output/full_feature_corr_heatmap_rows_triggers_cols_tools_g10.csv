@@ -1,0 +1,11 @@
+,write_memory
+trigger=\N,-0.005577221950626792
+trigger=assignment,0.0046036267201081445
+trigger=automation,-0.01082323558883167
+trigger=dm,0.09176168642470194
+trigger=introduction,-0.11773878201366068
+trigger=manual,-0.003122648020747328
+trigger=mention,0.020356277104074023
+trigger=scheduled,0.03705164961863063
+trigger=task_comment_mention,0.015882597245314732
+trigger=unknown,-0.04556782443167345

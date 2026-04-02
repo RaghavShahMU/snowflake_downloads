@@ -204,7 +204,7 @@
 <p><img class="img-fullscreenable" src="../analysis/output/classification_prompts_only_shap_beeswarm.png" alt="SHAP beeswarm — prompt features vs success"></p>
 <hr>
 <h2 id="correlation-explorer">Correlation explorer</h2>
-<p>Pick two facets (prompt dimensions and/or tools). Heatmaps load from this repo’s <code>analysis/output/</code> (use the published GitHub Pages link or a local server — not a raw <code>file://</code> path).</p>
+<p>Pick two facets (prompt dimensions, tools, triggers, or templates). Tools are split into <strong>groups of about six</strong> so each heatmap stays readable. Heatmaps load from this repo’s <code>analysis/output/</code> (use the published GitHub Pages link or a local server — not a raw <code>file://</code> path).</p>
 <div class="corr-matrix-wrap">
 <label>Rows <select id="corr-row-axis">
 <option value="functional_archetype" selected>Functional archetype</option>
@@ -221,7 +221,6 @@
 <option value="team_orientation">Team Orientation</option>
 <option value="state_persistence">State Persistence</option>
 <option value="output_modality">Output Modality</option>
-<option value="tools">Tools (avg usage / run)</option>
 <option value="triggers">Triggers (primary)</option>
 <option value="templates">Templates (primary)</option>
 </select></label> 
@@ -240,24 +239,23 @@
 <option value="team_orientation">Team Orientation</option>
 <option value="state_persistence">State Persistence</option>
 <option value="output_modality">Output Modality</option>
-<option value="tools" selected>Tools (avg usage / run)</option>
 <option value="triggers">Triggers (primary)</option>
-<option value="templates">Templates (primary)</option>
+<option value="templates" selected>Templates (primary)</option>
 </select></label>
 <p class="corr-hint">Double-click the chart (or double-tap on touch) for full screen. <kbd>Esc</kbd> closes.</p>
 <p id="corr-matrix-status"></p><img id="corr-matrix-img" alt="Correlation heatmap" width="900"></div><hr>
-<h2 id="correlation-highlights">Highlighted correlations</h2><ul>
-<li><span class="glossary" data-term="functional_archetype_creator">functional_archetype_creator</span> × <strong>todo_write</strong> — <em>r</em> = <strong>-0.40</strong> — Lower co-occurrence of <strong>todo_write</strong> with <strong>functional_archetype_creator</strong> (not causal).</li>
-<li><span class="glossary" data-term="execution_dataset_collection_scoped">execution_dataset_collection_scoped</span> × <strong>retrieve_tasks_by_filters</strong> — <em>r</em> = <strong>0.38</strong> — Higher co-occurrence of <strong>retrieve_tasks_by_filters</strong> with <strong>execution_dataset_collection_scoped</strong> (not causal).</li>
-<li><span class="glossary" data-term="external_integration_scope_web_research_integration">external_integration_scope_web_research_integration</span> × <strong>search_public_web</strong> — <em>r</em> = <strong>0.38</strong> — Higher co-occurrence of <strong>search_public_web</strong> with <strong>external_integration_scope_web_research_integration</strong> (not causal).</li>
-<li><span class="glossary" data-term="execution_dataset_collection_scoped">execution_dataset_collection_scoped</span> × <strong>trigger_scheduled</strong> — <em>r</em> = <strong>0.38</strong> — Higher co-occurrence of <strong>trigger_scheduled</strong> with <strong>execution_dataset_collection_scoped</strong> (not causal).</li>
-<li><span class="glossary" data-term="functional_archetype_monitor">functional_archetype_monitor</span> × <strong>trigger_scheduled</strong> — <em>r</em> = <strong>0.37</strong> — Higher co-occurrence of <strong>trigger_scheduled</strong> with <strong>functional_archetype_monitor</strong> (not causal).</li>
-<li><span class="glossary" data-term="execution_dataset_collection_scoped">execution_dataset_collection_scoped</span> × <strong>todo_write</strong> — <em>r</em> = <strong>0.37</strong> — Higher co-occurrence of <strong>todo_write</strong> with <strong>execution_dataset_collection_scoped</strong> (not causal).</li>
-<li><span class="glossary" data-term="output_modality_structured_document">output_modality_structured_document</span> × <strong>create_document</strong> — <em>r</em> = <strong>0.36</strong> — Higher co-occurrence of <strong>create_document</strong> with <strong>output_modality_structured_document</strong> (not causal).</li>
+<h2 id="correlation-highlights">Highlighted correlations</h2>
+<p>The strongest prompt×tool pairs are often <strong>label–instrument matches</strong> (e.g. “structured document” prompts lining up with document tools, or queue-scoped work lining up with task filters). Those are useful for sanity-checking the classifiers, but they are not strategically surprising. The patterns below cut across that layer: they sit where <strong>job framing and tooling pull in different directions</strong>, in line with who actually succeeds in the cohort.</p>
+<ul>
+<li><strong>Creator archetype vs. queue mechanics.</strong> <span class="glossary" data-term="functional_archetype_creator">functional_archetype_creator</span> shows one of the strongest negative ties to <strong>todo_write</strong> (<em>r</em> ≈ <strong>−0.40</strong>) and to <strong>retrieve_tasks_by_filters</strong> (<em>r</em> ≈ <strong>−0.36</strong>). Creator-heavy prompts cluster on conversational and generative tools; they largely <em>step away</em> from the list-and-filter primitives that define the highest-performing execution patterns. That is a product-relevant gap: the most common “job story” is not wired into the workflows that already work.</li>
+<li><strong>Outbound data flow vs. task hygiene.</strong> <span class="glossary" data-term="data_flow_direction_outbound">data_flow_direction_outbound</span> lines up with weaker use of <strong>todo_write</strong> (<em>r</em> ≈ <strong>−0.35</strong>) and <strong>retrieve_tasks_by_filters</strong> (<em>r</em> ≈ <strong>−0.30</strong>). “Ships net-new work out of ClickUp” framing anti-aligns with checklist mechanics beyond archetype alone — a broad producer vs. operator split worth naming in templates and onboarding.</li>
+<li><strong>Single-user-prompt scope vs. structured tracking.</strong> <span class="glossary" data-term="execution_dataset_single_user_prompt">execution_dataset_single_user_prompt</span> negatively tracks <strong>todo_write</strong> (<em>r</em> ≈ <strong>−0.33</strong>). Ad-hoc “answer this message” semantics drift away from durable work tracking, which matches the success model (collection-scoped patterns win; one-off prompt patterns struggle).</li>
+<li><strong>ClickUp-only vs. web stack.</strong> <span class="glossary" data-term="external_integration_scope_clickup_only">external_integration_scope_clickup_only</span> lines up with much lower use of <strong>search_public_web</strong> (<em>r</em> ≈ <strong>−0.31</strong>) and <strong>load_web_pages</strong> (<em>r</em> ≈ <strong>−0.28</strong>). Directionally obvious, but the magnitude underscores how tightly integration scope and real tool mix move together — siloed prompts and siloed capabilities show up as one object.</li>
+<li><strong>Consultative autonomy vs. checklist tools.</strong> <span class="glossary" data-term="autonomy_level_consultative">autonomy_level_consultative</span> negatively tracks <strong>todo_write</strong> (<em>r</em> ≈ <strong>−0.28</strong>). Human-gated flows are less entangled with todo/list primitives; whether that is healthy delegation or under-automation depends on use case, but it is a consistent behavioral signature.</li>
 </ul><hr>
 <h2 id="other-classification-dimensions">Other classification dimensions</h2>
-<details><summary><strong>Full detail — dimensions 3–11</strong> (open only if you need the full tables)</summary>
-<h3 id="3-domain-knowledge-depth">3. Domain knowledge depth</h3>
+<details><summary><strong>Full detail — additional dimensions</strong> (open only if you need the full tables)</summary>
+<h3 id="domain-knowledge-depth">Domain knowledge depth</h3>
 <h4>Classification</h4>
 <p>How much specialized field expertise is baked into the prompt (generic vs craft knowledge vs formal processes).</p>
 <h4>Distribution</h4>
@@ -286,7 +284,7 @@
 <p>Agents with moderate domain depth dominate the cohort but underperform; simplifying or clarifying prompts (e.g. toward light) may be worth testing.</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="4-operational-scope">4. Operational scope</h3>
+<h3 id="operational-scope">Operational scope</h3>
 <h4>Classification</h4>
 <p>How complex the agent&#x27;s workflow is per run (one action vs linear pipeline vs branching vs multiple workflows).</p>
 <h4>Distribution</h4>
@@ -315,7 +313,7 @@
 <p>Orchestration and branching are directionally more successful; simplifying to &quot;sequential&quot; in the prompt may be associated with lower success.</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="5-data-flow-direction">5. Data flow direction</h3>
+<h3 id="data-flow-direction">Data flow direction</h3>
 <h4>Classification</h4>
 <p>Where data moves relative to ClickUp (inbound, processing, outbound, or bidirectional).</p>
 <h4>Distribution</h4>
@@ -344,7 +342,7 @@
 <p>Outbound-dominant prompts are numerous but underperform; balancing with processing or bidirectional semantics may be worth exploring.</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="6-autonomy-level">6. Autonomy level</h3>
+<h3 id="autonomy-level">Autonomy level</h3>
 <h4>Classification</h4>
 <p>Whether the agent asks before acting, acts then reports, or acts silently (consultative, human_in_the_loop, autonomous, enforcer, monitor).</p>
 <h4>Distribution</h4>
@@ -372,7 +370,7 @@
 <p>Consultative framing may reduce success; encouraging clearer autonomous or human-in-the-loop patterns in prompts could help.</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="7-tone-and-persona">7. Tone and persona</h3>
+<h3 id="tone-and-persona">Tone and persona</h3>
 <h4>Classification</h4>
 <p>Communication style (professional_formal, casual_friendly, technical_precise, empathetic_supportive).</p>
 <h4>Distribution</h4>
@@ -401,7 +399,7 @@
 <p>Tone is a weaker driver than archetype or scope; formal tone is slightly associated with higher success.</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="8-domain-industry-vertical">8. Domain industry vertical</h3>
+<h3 id="domain-industry-vertical">Domain industry vertical</h3>
 <h4>Classification</h4>
 <p>Which industry or functional area the agent serves (PM, sales, marketing, HR, legal, finance, education, personal, creative, engineering, general).</p>
 <h4>Distribution</h4>
@@ -437,7 +435,7 @@
 <p>Creative and education verticals underperform; PM, sales, finance, personal productivity align with success. Vertical-specific onboarding could emphasize successful verticals.</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="9-external-integration-scope">9. External integration scope</h3>
+<h3 id="external-integration-scope">External integration scope</h3>
 <h4>Classification</h4>
 <p>Extent of integration with systems outside ClickUp (clickup_only, email, calendar, web_research, multiple_external_systems).</p>
 <h4>Distribution</h4>
@@ -467,7 +465,7 @@
 <p>Prompts that imply external integrations (email, calendar, multiple systems) associate with higher success than clickup_only.</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="10-use-case-context">10. Use case context</h3>
+<h3 id="use-case-context">Use case context</h3>
 <h4>Classification</h4>
 <p>High-level context of how the agent is used (specific workflow, general productivity, personal, entertainment, test_or_placeholder).</p>
 <h4>Distribution</h4>
@@ -498,7 +496,7 @@
 <p>Use case context is a weaker driver; general productivity in the population aligns with higher success despite negative coefficient (confounding with other dimensions possible).</p>
 <p><strong>Footnotes:</strong> Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template and avg tool usage per run. <strong>Correlation color code:</strong> <span class="corr-pos">Green</span> = positive correlation; <span class="corr-neg">Red</span> = negative correlation.</p>
 <hr>
-<h3 id="11-implied-end-date">11. Implied end date</h3>
+<h3 id="implied-end-date">Implied end date</h3>
 <h4>Classification</h4>
 <p>Whether the agent&#x27;s use case implies a defined end date (e.g. project end, course end).</p>
 <h4>Distribution</h4>
@@ -531,7 +529,7 @@
 <h3>Analytical approach</h3><ul>
 <li><strong>Success / failure / dormant</strong> — same definitions as main readout (7-day gate).</li>
 <li><strong>Prompts-only model</strong> — no triggers/templates as predictors; RF / SHAP / logistic on one-hot prompts.</li>
-<li><strong>Heatmaps</strong> — per-dimension slices + tools/triggers/templates (<code>leadership_corr_heatmap_map.json</code>).</li>
+<li><strong>Heatmaps</strong> — per-dimension slices; tools are chunked into groups of ~6 for legibility (<code>leadership_corr_heatmap_map.json</code>, <code>leadership_corr_tool_axis_options.json</code>).</li>
 </ul>
 <h3 id="prompts-only-model-summary">Prompts-only model summary</h3>
 <p>This section summarizes <strong>Random Forest importance</strong>, <strong>SHAP direction</strong>, and <strong>Logistic regression coefficients</strong> from the prompts-only model. <span class="corr-pos">Green</span> = feature associated with higher success; <span class="corr-neg">Red</span> = associated with lower success.</p>
@@ -694,6 +692,48 @@
   var colSel = document.getElementById('corr-col-axis');
   var img = document.getElementById('corr-matrix-img');
   var statusEl = document.getElementById('corr-matrix-status');
+
+  function injectToolGroupOptions(select, options) {
+    if (!select || !options || !options.length) return;
+    var before = select.querySelector('option[value="triggers"]');
+    if (!before) return;
+    for (var i = 0; i < options.length; i++) {
+      var o = options[i];
+      if (!o || !o.value) continue;
+      var opt = document.createElement('option');
+      opt.value = o.value;
+      opt.textContent = o.label || o.value;
+      select.insertBefore(opt, before);
+    }
+  }
+
+  function toolGroupOptionsFromManifest(manifest) {
+    var seen = {};
+    var re = /^tools_g\d+$/;
+    Object.keys(manifest || {}).forEach(function (k) {
+      k.split('|').forEach(function (part) {
+        if (re.test(part)) seen[part] = true;
+      });
+    });
+    return Object.keys(seen)
+      .sort(function (a, b) {
+        var na = parseInt(a.replace(/^tools_g/, ''), 10);
+        var nb = parseInt(b.replace(/^tools_g/, ''), 10);
+        return na - nb;
+      })
+      .map(function (id) {
+        var n = id.replace(/^tools_g/, '');
+        return { value: id, label: 'Tools group ' + n };
+      });
+  }
+
+  function axisLabelForStatus(axisId) {
+    if (!axisId) return '';
+    var m = /^tools_g(\d+)$/.exec(axisId);
+    if (m) return 'Tools group ' + m[1];
+    return axisId;
+  }
+
   function updateHeatmap() {
     var rk = rowSel && rowSel.value;
     var ck = colSel && colSel.value;
@@ -702,8 +742,9 @@
     if (path) {
       img.src = path;
       img.style.display = '';
-      img.alt = 'Correlation heatmap: ' + rk + ' × ' + ck;
-      statusEl.textContent = 'Rows: ' + rk + ', columns: ' + ck + '. Pearson r (full classified feature set; see methodology).';
+      img.alt = 'Correlation heatmap: ' + axisLabelForStatus(rk) + ' × ' + axisLabelForStatus(ck);
+      statusEl.textContent = 'Rows: ' + axisLabelForStatus(rk) + ', columns: ' + axisLabelForStatus(ck) +
+        '. Pearson r (full classified feature set; see methodology).';
     } else {
       img.removeAttribute('src');
       img.style.display = 'none';
@@ -715,14 +756,17 @@
     colSel.addEventListener('change', updateHeatmap);
     if (statusEl) statusEl.textContent = 'Loading correlation heatmap index…';
     var heatmapUrl = '../analysis/output/leadership_corr_heatmap_map.json';
-    fetch(heatmapUrl)
-      .then(function (r) {
-        if (!r.ok) {
-          throw new Error('HTTP ' + r.status + ' for ' + heatmapUrl);
-        }
+    var toolAxisUrl = '../analysis/output/leadership_corr_tool_axis_options.json';
+    Promise.all([
+      fetch(heatmapUrl).then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status + ' for ' + heatmapUrl);
         return r.json();
-      })
-      .then(function (raw) {
+      }),
+      fetch(toolAxisUrl).then(function (r) { return r.ok ? r.json() : []; }),
+    ])
+      .then(function (pair) {
+        var raw = pair[0];
+        var toolOpts = Array.isArray(pair[1]) ? pair[1] : [];
         heatmapMap = heatmapPathsFromManifest(raw && typeof raw === 'object' ? raw : {});
         if (!heatmapMap || Object.keys(heatmapMap).length === 0) {
           if (statusEl) {
@@ -734,6 +778,16 @@
           }
           return;
         }
+        if (!toolOpts.length) toolOpts = toolGroupOptionsFromManifest(raw);
+        injectToolGroupOptions(rowSel, toolOpts);
+        injectToolGroupOptions(colSel, toolOpts);
+        var preferred = 'tools_g1';
+        var hasPreferred = false;
+        for (var i = 0; i < colSel.options.length; i++) {
+          if (colSel.options[i].value === preferred) { hasPreferred = true; break; }
+        }
+        if (hasPreferred) colSel.value = preferred;
+        else if (toolOpts[0] && toolOpts[0].value) colSel.value = toolOpts[0].value;
         updateHeatmap();
       })
       .catch(function (err) {

@@ -1,11 +1,11 @@
 # Prompts-only classification readout
 
 **Last updated:** 2026-04-03  
-**Maintenance:** This file and `prompts_classification_readout_plain.html` are edited by hand. Refresh numbers, charts, and `analysis/output/leadership_corr_heatmap_map.json` by running the analysis scripts; there is no doc generator for these readouts.  
+**Maintenance:** This file and `prompts_classification_readout_plain.html` are edited by hand. Refresh numbers, charts, `analysis/output/leadership_corr_heatmap_map.json`, and `leadership_corr_tool_axis_options.json` by running the analysis scripts; there is no doc generator for these readouts.  
 **Scope:** Classification dimensions only (no triggers or tools in the success model). Correlation sections add tools, triggers, and templates for context.  
 **Data:** Classified cohort (agents in `agent_classifications.csv` with success_segment from cohort).  
 **Value meanings:** See [semantic_layer/models/agent_classifications.md](semantic_layer/models/agent_classifications.md).  
-**Interactive view:** [prompts_classification_readout_plain.html](prompts_classification_readout_plain.html) loads heatmap paths from `../analysis/output/leadership_corr_heatmap_map.json` at runtime (serve over HTTP if `file://` blocks fetch).
+**Interactive view:** [prompts_classification_readout_plain.html](prompts_classification_readout_plain.html) loads heatmap paths from `../analysis/output/leadership_corr_heatmap_map.json` and tool-group labels from `leadership_corr_tool_axis_options.json` at runtime (serve over HTTP if `file://` blocks fetch).
 
 ## Executive summary
 
@@ -111,14 +111,9 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 </details>
 
 <details>
-<summary><strong>Finding 3 — Prompt × tool/trigger links</strong> — <em>High-|r| pairs with calendar-style tools de-ranked—open for surprises.</em></summary>
+<summary><strong>Finding 3 — Prompt × tool/trigger links</strong> — <em>See the HTML readout for a short list of non-obvious pairs; many top |r| values are label–instrument matches.</em></summary>
 
-- **functional_archetype=creator** ↔ **todo_write** — *r* = **-0.40** — Lower rate of **todo_write** among agents with **functional_archetype=creator** (co-movement; not causal).
-- **execution_dataset=collection_scoped** ↔ **retrieve_tasks_by_filters** — *r* = **0.38** — Higher rate of **retrieve_tasks_by_filters** among agents with **execution_dataset=collection_scoped** (co-movement; not causal).
-- **external_integration_scope=web_research_integration** ↔ **search_public_web** — *r* = **0.38** — Higher rate of **search_public_web** among agents with **external_integration_scope=web_research_integration** (co-movement; not causal).
-- **execution_dataset=collection_scoped** ↔ **trigger=scheduled** — *r* = **0.38** — Higher rate of **trigger=scheduled** among agents with **execution_dataset=collection_scoped** (co-movement; not causal).
-- **functional_archetype=monitor** ↔ **trigger=scheduled** — *r* = **0.37** — Higher rate of **trigger=scheduled** among agents with **functional_archetype=monitor** (co-movement; not causal).
-- **execution_dataset=collection_scoped** ↔ **todo_write** — *r* = **0.37** — Higher rate of **todo_write** among agents with **execution_dataset=collection_scoped** (co-movement; not causal).
+The largest correlations often repeat the classification wording (“web research” with search tools, “structured document” with document tools). The **Highlighted correlations** section in `prompts_classification_readout_plain.html` focuses on cross-cutting patterns (creator vs. queue tooling, outbound vs. task hygiene, etc.).
 </details>
 
 ---
@@ -163,23 +158,23 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ## Correlation matrix explorer
 
-*Interactive heatmap selector is in the HTML readout.* Run `python analysis/full_feature_readout_analysis.py` to generate matrix PNGs under `analysis/output/`.
+*Interactive heatmap selector is in the HTML readout.* Run `python analysis/full_feature_readout_analysis.py` to regenerate slices under `analysis/output/`; tools are split into **groups of ~six** (`tools_g1` … in `leadership_corr_heatmap_map.json`, labels in `leadership_corr_tool_axis_options.json`).
 
 ## Highlighted correlations
 
-- **functional_archetype=creator** × **todo_write** — *r* = **-0.40** — Lower rate of todo_write among agents with functional_archetype=creator (co-movement; not causal).
-- **execution_dataset=collection_scoped** × **retrieve_tasks_by_filters** — *r* = **0.38** — Higher rate of retrieve_tasks_by_filters among agents with execution_dataset=collection_scoped (co-movement; not causal).
-- **external_integration_scope=web_research_integration** × **search_public_web** — *r* = **0.38** — Higher rate of search_public_web among agents with external_integration_scope=web_research_integration (co-movement; not causal).
-- **execution_dataset=collection_scoped** × **trigger=scheduled** — *r* = **0.38** — Higher rate of trigger=scheduled among agents with execution_dataset=collection_scoped (co-movement; not causal).
-- **functional_archetype=monitor** × **trigger=scheduled** — *r* = **0.37** — Higher rate of trigger=scheduled among agents with functional_archetype=monitor (co-movement; not causal).
-- **execution_dataset=collection_scoped** × **todo_write** — *r* = **0.37** — Higher rate of todo_write among agents with execution_dataset=collection_scoped (co-movement; not causal).
-- **output_modality=structured_document** × **create_document** — *r* = **0.36** — Higher rate of create_document among agents with output_modality=structured_document (co-movement; not causal).
+Many top prompt×tool correlations are **label–instrument matches** (sanity checks for the classifier, not strategic surprises). Stronger judgment calls include:
+
+- **Creator archetype vs. queue mechanics** — **functional_archetype=creator** vs. **todo_write** (*r* ≈ **−0.40**) and **retrieve_tasks_by_filters** (*r* ≈ **−0.36**). Creator-heavy prompts skew away from list-and-filter primitives that dominate successful execution patterns.
+- **Outbound data flow vs. task hygiene** — **data_flow_direction=outbound** vs. **todo_write** (*r* ≈ **−0.35**) and **retrieve_tasks_by_filters** (*r* ≈ **−0.30**). “Net-new output leaves ClickUp” framing anti-aligns with checklist mechanics beyond archetype alone.
+- **Single-user-prompt scope** — **execution_dataset=single_user_prompt** vs. **todo_write** (*r* ≈ **−0.33**). Ad-hoc request semantics drift from durable work tracking, consistent with collection-scoped success patterns.
+- **ClickUp-only vs. web stack** — **external_integration_scope=clickup_only** vs. **search_public_web** (*r* ≈ **−0.31**) and **load_web_pages** (*r* ≈ **−0.28**). Integration scope and realized tool mix move tightly together.
+- **Consultative autonomy** — **autonomy_level=consultative** vs. **todo_write** (*r* ≈ **−0.28**). Human-gated flows show weaker entanglement with todo/list primitives.
 
 ---
 
 ## Other classification dimensions
 
-### 3. Domain knowledge depth
+### Domain knowledge depth
 
 **Classification**  
 How much specialized field expertise is baked into the prompt (generic vs craft knowledge vs formal processes).
@@ -214,7 +209,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 4. Operational scope
+### Operational scope
 
 **Classification**  
 How complex the agent's workflow is per run (one action vs linear pipeline vs branching vs multiple workflows).
@@ -249,7 +244,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 5. Data flow direction
+### Data flow direction
 
 **Classification**  
 Where data moves relative to ClickUp (inbound, processing, outbound, or bidirectional).
@@ -284,7 +279,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 6. Autonomy level
+### Autonomy level
 
 **Classification**  
 Whether the agent asks before acting, acts then reports, or acts silently (consultative, human_in_the_loop, autonomous, enforcer, monitor).
@@ -318,7 +313,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 7. Tone and persona
+### Tone and persona
 
 **Classification**  
 Communication style (professional_formal, casual_friendly, technical_precise, empathetic_supportive).
@@ -353,7 +348,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 8. Domain industry vertical
+### Domain industry vertical
 
 **Classification**  
 Which industry or functional area the agent serves (PM, sales, marketing, HR, legal, finance, education, personal, creative, engineering, general).
@@ -395,7 +390,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 9. External integration scope
+### External integration scope
 
 **Classification**  
 Extent of integration with systems outside ClickUp (clickup_only, email, calendar, web_research, multiple_external_systems).
@@ -431,7 +426,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 10. Use case context
+### Use case context
 
 **Classification**  
 High-level context of how the agent is used (specific workflow, general productivity, personal, entertainment, test_or_placeholder).
@@ -468,7 +463,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 ---
 
-### 11. Implied end date
+### Implied end date
 
 **Classification**  
 Whether the agent's use case implies a defined end date (e.g. project end, course end).
@@ -507,7 +502,7 @@ Correlations are agent-level Pearson (|r| ≥ 0.05); primary trigger/template an
 
 - **Success:** Used ≥1 after **7** days and still **active**; **failure:** inactive/deleted; **dormant:** active but **no use** after 7 days.
 - **Prompts-only model:** Predicts success vs non-success from **one-hot** classification columns only.
-- **Heatmaps** use per-dimension slices from `leadership_corr_heatmap_map.json` (run `full_feature_readout_analysis.py`); column set is the full classified build plus tools/triggers/templates.
+- **Heatmaps** use per-dimension slices from `leadership_corr_heatmap_map.json` (run `full_feature_readout_analysis.py`); tools are split into ~6-column groups for readability, alongside triggers/templates and the full prompt one-hot grid.
 
 ### Prompts-only model detail
 ### Prompts-only model summary

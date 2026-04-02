@@ -1,0 +1,7 @@
+,write_memory
+update_chat_message,0.006069685878666508
+update_comment,0.018650221901570674
+update_document,0.05646304085712461
+update_google_calendar_event,0.009069119440680373
+update_task,0.036705903569713094
+view_tools_catalog,0.03058957967736524
